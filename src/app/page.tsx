@@ -3,9 +3,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { 
   UploadCloud, Zap, Loader2, Download, AlertCircle, BarChart3, Settings2, IndianRupee,
-  Activity, Lock, Globe, Cpu, Play, Volume2, Send, Bot, Rocket, Layers,
+  Activity, Lock, Globe, Cpu, Send, Bot, Rocket, Layers,
   Fingerprint, Radio, MousePointer2, Pencil, Ruler, Calculator, Box, TrendingUp,
-  ShieldAlert, Sparkles, BrainCircuit, Network, Microscope, Info
+  ShieldAlert, Sparkles, BrainCircuit, Network, Microscope, Info, CheckCircle2
 } from "lucide-react";
 import clsx from "clsx";
 import { 
@@ -55,7 +55,6 @@ export default function EnergyBaeDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [agentThoughts, setAgentThoughts] = useState<AgentThought[]>([]);
   const [activeTab, setActiveTab] = useState<'audit' | 'forecast' | 'hardware' | 'chat'>('audit');
-  const [isSpeaking, setIsSpeaking] = useState(false);
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<{role: 'user' | 'bot', text: string}[]>([]);
   const [roiInvestment, setRoiInvestment] = useState(150000);
@@ -76,17 +75,6 @@ export default function EnergyBaeDashboard() {
       setFile(e.target.files[0]);
       setError(null);
     }
-  };
-
-  const speakSummary = () => {
-    if (!extractedData) return;
-    setIsSpeaking(true);
-    const text = `Neural Profile generated for ${extractedData.consumerName}. Analysis indicates ${extractedData.aiInsights?.loadEfficiency} load efficiency with a seasonality index of ${extractedData.aiInsights?.seasonalityIndex}. Forecasting suggests a twenty-two percent energy spike in summer months. System recommendation: Windistar 400 with Bifacial Solar array.`;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.onend = () => setIsSpeaking(false);
-    utterance.pitch = 0.85;
-    utterance.rate = 1.05;
-    window.speechSynthesis.speak(utterance);
   };
 
   const handleSendMessage = () => {
@@ -292,9 +280,6 @@ export default function EnergyBaeDashboard() {
                        <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Anomaly Factor</p>
                        <p className="text-4xl font-black text-yellow-500">{extractedData.aiInsights?.seasonalityIndex}x</p>
                     </div>
-                    <button onClick={speakSummary} className="w-20 h-20 rounded-full border border-white/10 flex items-center justify-center hover:bg-white hover:text-slate-950 transition-all group">
-                       <Play className={clsx("w-8 h-8", isSpeaking && "animate-pulse")} />
-                    </button>
                     <button onClick={generateExcel} className="h-20 px-12 rounded-[2rem] bg-white text-slate-950 font-black text-lg shadow-2xl hover:scale-105 transition-all">
                        EXPORT ML REPORT
                     </button>
@@ -313,7 +298,7 @@ export default function EnergyBaeDashboard() {
                  <div className="glass-card p-10 rounded-[3rem] bg-gradient-to-br from-yellow-500/10 to-transparent">
                     <div className="flex justify-between mb-8 items-center">
                        <IndianRupee className="w-6 h-6 text-yellow-500" />
-                       <span className="font-handwriting text-yellow-500/60 text-lg">Z-Score Normalization Active</span>
+                       <span className="font-handwriting text-yellow-500/60 text-lg">Payback: {breakEvenYears} yrs</span>
                     </div>
                     <input 
                       type="range" min="50000" max="1000000" step="10000" value={roiInvestment} 
@@ -325,8 +310,26 @@ export default function EnergyBaeDashboard() {
                  </div>
               </div>
 
-              {/* Neural Canvas Content */}
+              {/* Neural Canvas Content Area */}
               <div className="lg:col-span-9 space-y-8">
+                 {/* EXECUTIVE SUMMARY PANEL (Replaced Voice) */}
+                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-10 rounded-[3rem] bg-white/5 border border-white/10 flex items-start gap-8 relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-8 opacity-[0.05] group-hover:opacity-[0.2] transition-opacity">
+                       <Sparkles className="w-20 h-20 text-yellow-500" />
+                    </div>
+                    <div className="w-16 h-16 rounded-2xl bg-yellow-500/20 flex items-center justify-center shrink-0">
+                       <CheckCircle2 className="w-8 h-8 text-yellow-500" />
+                    </div>
+                    <div>
+                       <h3 className="text-xl font-black text-white mb-3">Neural Executive Summary</h3>
+                       <div className="font-handwriting text-2xl text-yellow-500/70 space-y-2 leading-relaxed">
+                          <p>• Consumption profile validated with {extractedData.aiInsights?.confidence.toFixed(2)}% confidence.</p>
+                          <p>• {extractedData.aiInsights?.loadEfficiency} load efficiency detected; {extractedData.aiInsights?.seasonalityIndex}x seasonality variance found.</p>
+                          <p>• Strategic Recommendation: Deploy Hybrid VAWT Windistar 400 array to mitigate peak summer spikes.</p>
+                       </div>
+                    </div>
+                 </motion.div>
+
                  <AnimatePresence mode="wait">
                     {activeTab === 'audit' && (
                       <motion.div key="audit" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-12 rounded-[4rem] h-[550px] relative">
