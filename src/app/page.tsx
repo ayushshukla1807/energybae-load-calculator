@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { 
   UploadCloud, Zap, Loader2, Download, AlertCircle, BarChart3, Settings2, IndianRupee,
   Activity, Lock, Globe, Cpu, Send, Bot, Layers,
@@ -179,7 +180,7 @@ export default function EnergyBaeDashboard() {
   const treesSaved = (Number(carbonSaved) / 20).toFixed(0);
 
   return (
-    <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-yellow-500/30 overflow-x-hidden relative">
+    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-yellow-500/30 overflow-x-hidden relative">
       <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -193,25 +194,27 @@ export default function EnergyBaeDashboard() {
 
       <nav className="relative z-50 px-12 py-10 flex justify-between items-center">
         <div className="flex items-center gap-4 group cursor-pointer" onClick={() => window.location.reload()}>
-          <div className="w-14 h-14 bg-gradient-to-tr from-yellow-500 to-amber-600 rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-yellow-500/20 group-hover:scale-105 transition-transform">
-            <Hexagon className="text-slate-950 w-8 h-8 fill-current" />
+          <div className="w-14 h-14 bg-gradient-to-tr from-yellow-500 to-amber-600 rounded-[1.5rem] flex items-center justify-center shadow-xl dark:shadow-2xl shadow-yellow-500/10 dark:shadow-yellow-500/20 group-hover:scale-105 transition-transform">
+            <Hexagon className="text-background w-8 h-8 fill-current" />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tighter uppercase leading-none">EnergyBae</h1>
+            <h1 className="text-3xl font-black tracking-tighter uppercase leading-none text-foreground">EnergyBae</h1>
             <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mt-1">Enterprise AI Suite V19.0</p>
           </div>
         </div>
-        
-        <div className="hidden md:flex items-center gap-2 p-1 bg-white/5 border border-white/10 rounded-full">
-           <button onClick={() => setSelectedModel('gemini')} className={clsx("px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", selectedModel === 'gemini' ? "bg-yellow-500 text-black shadow-lg shadow-yellow-500/20" : "text-slate-500 hover:text-white")}>Gemini 1.5</button>
-           <button onClick={() => setSelectedModel('llama')} className={clsx("px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", selectedModel === 'llama' ? "bg-white text-black shadow-lg" : "text-slate-500 hover:text-white")}>Llama-3-70B</button>
-           <button onClick={() => setSelectedModel('claude')} className={clsx("px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", selectedModel === 'claude' ? "bg-blue-500 text-white shadow-lg shadow-blue-500/20" : "text-slate-500 hover:text-white")}>Sonnet 3.5</button>
+        <div className="flex items-center gap-4">
+           <ThemeToggle />
+           <div className="hidden md:flex items-center gap-2 p-1 bg-card border border-border rounded-full">
+              <button onClick={() => setSelectedModel('gemini')} className={clsx("px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", selectedModel === 'gemini' ? "bg-yellow-500 text-background dark:text-black shadow-lg shadow-yellow-500/20" : "text-muted-foreground hover:text-foreground")}>Gemini 1.5</button>
+              <button onClick={() => setSelectedModel('llama')} className={clsx("px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", selectedModel === 'llama' ? "bg-white text-background dark:text-black shadow-lg" : "text-muted-foreground hover:text-foreground")}>Llama-3-70B</button>
+              <button onClick={() => setSelectedModel('claude')} className={clsx("px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", selectedModel === 'claude' ? "bg-blue-500 text-foreground shadow-lg shadow-blue-500/20" : "text-muted-foreground hover:text-foreground")}>Sonnet 3.5</button>
+           </div>
         </div>
 
         <div className="flex items-center gap-10">
           <NavInfo label="Model Status" value="Online / 14ms" />
-          <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center bg-white/5 relative group cursor-pointer">
-             <Bot className="w-6 h-6 text-slate-500 group-hover:text-yellow-500 transition-colors" />
+          <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-card relative group cursor-pointer">
+             <Bot className="w-6 h-6 text-muted-foreground group-hover:text-yellow-500 transition-colors" />
              <div className="absolute inset-0 bg-yellow-500/10 blur-xl opacity-0 group-hover:opacity-100 rounded-full transition-opacity" />
           </div>
         </div>
@@ -230,7 +233,7 @@ export default function EnergyBaeDashboard() {
                    Strategic <br/>
                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-600">Forecasting.</span>
                 </h2>
-                <p className="text-xl text-slate-500 font-medium max-w-xl leading-relaxed mb-12">
+                <p className="text-xl text-muted-foreground font-medium max-w-xl leading-relaxed mb-12">
                    Professional energy intelligence for the Maharashtra region. RAG-grounded multi-modal inference with Gemini 1.5 Flash.
                 </p>
                 
@@ -242,11 +245,11 @@ export default function EnergyBaeDashboard() {
                 )}
 
                 <div className="glass-card p-1 rounded-[3rem] relative group mb-6">
-                  <div className="p-10 border-2 border-dashed border-white/5 rounded-[2.8rem] group-hover:border-yellow-500/30 transition-all">
+                  <div className="p-10 border-2 border-dashed border-border rounded-[2.8rem] group-hover:border-yellow-500/30 transition-all">
                     <input type="file" id="bill-upload" className="hidden" onChange={handleFileChange} />
                     <label htmlFor="bill-upload" className="cursor-pointer flex items-center gap-8">
                        <div className="w-20 h-20 bg-yellow-500 rounded-3xl flex items-center justify-center shadow-2xl shadow-yellow-500/40">
-                          <UploadCloud className="w-10 h-10 text-slate-950" />
+                          <UploadCloud className="w-10 h-10 text-background" />
                        </div>
                        <div>
                           <p className="text-2xl font-black">{file ? file.name : "Secure Document Upload"}</p>
@@ -260,7 +263,7 @@ export default function EnergyBaeDashboard() {
                    <button 
                      onClick={handleExtract} 
                      disabled={isExtracting}
-                     className="flex-1 py-6 rounded-[2rem] bg-white text-slate-950 font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-white/10 disabled:opacity-50 flex items-center justify-center gap-4 relative overflow-hidden group"
+                     className="flex-1 py-6 rounded-[2rem] bg-white text-background font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-white/10 disabled:opacity-50 flex items-center justify-center gap-4 relative overflow-hidden group"
                    >
                      {isExtracting && <div className="absolute inset-0 bg-yellow-500/20 w-[200%] animate-scan" />}
                      <div className="relative z-10 flex items-center gap-4">
@@ -273,9 +276,9 @@ export default function EnergyBaeDashboard() {
 
               <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="relative mt-10 lg:mt-0">
                 <div className="absolute inset-0 bg-yellow-500/10 blur-[120px] rounded-full" />
-                <div className="relative rounded-[3rem] overflow-hidden border-2 border-white/5 shadow-2xl shadow-yellow-500/20 group">
+                <div className="relative rounded-[3rem] overflow-hidden border-2 border-border shadow-xl dark:shadow-2xl shadow-yellow-500/10 dark:shadow-yellow-500/20 group">
                    <Image src="/solar-array.png" alt="Solar Analytics Array" width={800} height={800} className="relative z-10 w-full h-[600px] object-cover transition-transform duration-1000 group-hover:scale-105" />
-                   <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/80 to-transparent z-20" />
+                   <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-20" />
                    
                    {isExtracting && (
                       <div className="absolute inset-0 z-30 flex flex-col items-center justify-center">
@@ -293,13 +296,13 @@ export default function EnergyBaeDashboard() {
                       
                       {isExtracting ? (
                          <div className="space-y-2">
-                           <div className="h-1 w-full bg-white/10 rounded-full overflow-hidden">
+                           <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
                               <div className="h-full bg-yellow-500 w-1/3 animate-[pulse_2s_ease-in-out_infinite]" />
                            </div>
-                           <p className="text-[9px] font-mono text-slate-400">Agent Orchestration Graph Building...</p>
+                           <p className="text-[9px] font-mono text-muted-foreground">Agent Orchestration Graph Building...</p>
                          </div>
                       ) : (
-                         <h3 className="text-3xl font-black text-white leading-none">Global Array Cluster</h3>
+                         <h3 className="text-3xl font-black text-foreground leading-none">Global Array Cluster</h3>
                       )}
                    </div>
                 </div>
@@ -310,10 +313,10 @@ export default function EnergyBaeDashboard() {
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="lg:col-span-12 glass-card p-12 rounded-[4rem] flex flex-col md:flex-row justify-between items-center border-2 border-yellow-500/10 relative overflow-hidden group">
                  <div className="flex items-center gap-8 relative z-10">
                     <div className="w-24 h-24 rounded-[2rem] bg-yellow-500 flex items-center justify-center shadow-2xl shadow-yellow-500/30">
-                       <Microscope className="w-10 h-10 text-slate-950" />
+                       <Microscope className="w-10 h-10 text-background" />
                     </div>
                     <div>
-                       <h2 className="text-5xl font-black tracking-tighter text-white mb-2">{extractedData.consumerName}</h2>
+                       <h2 className="text-5xl font-black tracking-tighter text-foreground mb-2">{extractedData.consumerName}</h2>
                        <div className="flex gap-4">
                           <Badge label={`LOAD: ${extractedData.sanctionedLoad}kW`} />
                           <Badge label={`MODEL: ${extractedData.aiInsights?.modelUsed || 'Gemini 1.5'}`} />
@@ -327,11 +330,11 @@ export default function EnergyBaeDashboard() {
                  </div>
                  
                  <div className="flex items-center gap-6 relative z-10">
-                    <button onClick={() => setShowAuditTrail(!showAuditTrail)} className="w-20 h-20 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all group relative">
-                       <Search className="w-8 h-8 text-slate-500 group-hover:text-yellow-500" />
+                    <button onClick={() => setShowAuditTrail(!showAuditTrail)} className="w-20 h-20 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-all group relative">
+                       <Search className="w-8 h-8 text-muted-foreground group-hover:text-yellow-500" />
                        <div className="absolute top-[-40px] whitespace-nowrap opacity-0 group-hover:opacity-100 text-[9px] font-black uppercase tracking-widest text-yellow-500 transition-opacity">Technical Log</div>
                     </button>
-                    <button onClick={generateExcel} className="h-20 px-12 rounded-[2rem] bg-white text-slate-950 font-black text-lg shadow-2xl hover:scale-105 transition-all">
+                    <button onClick={generateExcel} className="h-20 px-12 rounded-[2rem] bg-white text-background font-black text-lg shadow-2xl hover:scale-105 transition-all">
                        EXPORT TECHNICAL AUDIT
                     </button>
                  </div>
@@ -400,7 +403,7 @@ export default function EnergyBaeDashboard() {
                        <motion.div key="vision" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-12 rounded-[4rem] h-[550px] relative overflow-hidden flex items-center justify-center">
                           <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-luminosity" />
                           
-                          <div className="relative z-10 w-full max-w-2xl bg-black/50 p-8 rounded-[2rem] border border-white/10 backdrop-blur-md">
+                          <div className="relative z-10 w-full max-w-2xl bg-background/80 p-8 rounded-[2rem] border border-border backdrop-blur-md">
                              <h3 className="text-xl font-black flex items-center gap-4 mb-6 text-yellow-500">
                                 <ScanFace className="w-6 h-6" /> Deep Vision Heatmap (Simulated)
                              </h3>
@@ -438,7 +441,7 @@ export default function EnergyBaeDashboard() {
                           <div className="flex-1 overflow-y-auto space-y-6 px-4 pb-4">
                              {chatHistory.map((msg, i) => (
                                <div key={i} className={clsx("flex flex-col max-w-[80%]", msg.role === 'user' ? "ml-auto items-end" : "items-start")}>
-                                  <div className={clsx("p-6 rounded-[2rem] text-sm leading-relaxed shadow-lg", msg.role === 'user' ? "bg-yellow-500 text-black font-medium rounded-tr-sm" : "bg-white/5 border border-white/10 rounded-tl-sm")}>
+                                  <div className={clsx("p-6 rounded-[2rem] text-sm leading-relaxed shadow-lg", msg.role === 'user' ? "bg-yellow-500 text-background dark:text-black font-medium rounded-tr-sm" : "bg-card border border-border rounded-tl-sm")}>
                                     {msg.text}
                                   </div>
                                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 mt-2">
@@ -456,9 +459,9 @@ export default function EnergyBaeDashboard() {
                                onChange={(e) => setChatMessage(e.target.value)}
                                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
                                placeholder="Ask the AI Engineer for technical optimization strategies..."
-                               className="flex-1 bg-white/5 border border-white/10 rounded-[2rem] px-8 py-4 outline-none focus:border-yellow-500/50 transition-colors"
+                               className="flex-1 bg-card border border-border rounded-[2rem] px-8 py-4 outline-none focus:border-yellow-500/50 transition-colors"
                              />
-                             <button onClick={handleSendMessage} className="w-16 h-16 rounded-[2rem] bg-yellow-500 flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-black">
+                             <button onClick={handleSendMessage} className="w-16 h-16 rounded-[2rem] bg-yellow-500 flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-background dark:text-black">
                                <Send className="w-6 h-6" />
                              </button>
                           </div>
@@ -472,14 +475,14 @@ export default function EnergyBaeDashboard() {
                                 <TreeDeciduous className="w-12 h-12 text-emerald-500" />
                              </div>
                              <h4 className="text-7xl font-black text-emerald-500 tracking-tighter">{treesSaved}</h4>
-                             <p className="text-sm font-black uppercase tracking-widest text-slate-500">Trees Saved Annually</p>
+                             <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">Trees Saved Annually</p>
                           </div>
                           <div className="glass-card p-12 rounded-[4rem] flex flex-col justify-center items-center text-center">
                              <div className="w-24 h-24 rounded-full bg-blue-500/10 flex items-center justify-center mb-8">
                                 <Globe className="w-12 h-12 text-blue-500" />
                              </div>
                              <h4 className="text-7xl font-black text-blue-500 tracking-tighter">{carbonSaved}</h4>
-                             <p className="text-sm font-black uppercase tracking-widest text-slate-500">KG CO2 Offset / Year</p>
+                             <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">KG CO2 Offset / Year</p>
                           </div>
                        </motion.div>
                     )}
@@ -524,7 +527,7 @@ export default function EnergyBaeDashboard() {
                     )}
                  </AnimatePresence>
 
-                 <div className="mt-10 p-10 bg-[#020617] border border-white/5 rounded-[3rem] shadow-2xl relative overflow-hidden group">
+                 <div className="mt-10 p-10 bg-background border border-border rounded-[3rem] shadow-2xl relative overflow-hidden group">
                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent animate-beam-move" />
                     <div className="flex justify-between items-center mb-6">
                        <div className="flex items-center gap-3">
@@ -562,18 +565,18 @@ function NavInfo({ label, value }: { label: string, value: string }) {
   return (
     <div className="text-right">
        <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest leading-none mb-1">{label}</p>
-       <p className="text-[11px] font-black text-white uppercase leading-none">{value}</p>
+       <p className="text-[11px] font-black text-foreground uppercase leading-none">{value}</p>
     </div>
   );
 }
 
 function Badge({ label }: { label: string }) {
-  return <div className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[9px] font-black text-slate-500 uppercase tracking-widest">{label}</div>;
+  return <div className="px-3 py-1 rounded-lg bg-card border border-border text-[9px] font-black text-muted-foreground uppercase tracking-widest">{label}</div>;
 }
 
 function SideButton({ id, label, active, set, icon: Icon }: any) {
   return (
-    <button onClick={() => set(id)} className={clsx("w-full flex items-center gap-4 px-8 py-6 rounded-[2rem] transition-all duration-500", active === id ? "bg-white text-slate-950 shadow-2xl" : "hover:bg-white/5 text-slate-500")}>
+    <button onClick={() => set(id)} className={clsx("w-full flex items-center gap-4 px-8 py-6 rounded-[2rem] transition-all duration-500", active === id ? "bg-white text-background shadow-2xl" : "hover:bg-card text-muted-foreground")}>
        <Icon className="w-5 h-5" />
        <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
     </button>
