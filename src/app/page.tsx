@@ -549,7 +549,7 @@ export default function EnergyBaeDashboard() {
           <FooterLink label="Vector Index" />
           <FooterLink label="System Status" />
         </div>
-      </footer export default>
+      </footer>
     </div>
   );
 }
