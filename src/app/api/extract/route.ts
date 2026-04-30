@@ -14,10 +14,10 @@ export async function POST(req: NextRequest) {
     const keyToUse = apiKey || process.env.OPENAI_API_KEY;
     
     if (keyToUse === "DEMO") {
-      // Safety net for interview demo without real API key
       return NextResponse.json({
         consumerName: "Shri Madhusham Roopchand Khobragade",
         consumerNo: "439320095567",
+        billingUnit: "4393",
         fixedCharges: 130,
         sanctionedLoad: 3.30,
         connectionType: "90/LT I Res 1-Phase",
@@ -40,14 +40,12 @@ export async function POST(req: NextRequest) {
     }
 
     if (!keyToUse) {
-      return NextResponse.json({ error: "OpenAI API key is missing. Please provide it in the UI or add it to .env.local" }, { status: 401 });
+      return NextResponse.json({ error: "OpenAI API key missing" }, { status: 401 });
     }
 
     const openai = new OpenAI({ apiKey: keyToUse });
-
     const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64Image = buffer.toString("base64");
+    const base64Image = Buffer.from(arrayBuffer).toString("base64");
 
     const response = await openai.chat.completions.create({
       model: "gpt-4o",
@@ -57,23 +55,24 @@ export async function POST(req: NextRequest) {
           content: [
             {
               type: "text",
-              text: `You are an AI assistant tasked with extracting data from an electricity bill. Extract the following fields as JSON:
+              text: `You are an expert Energy Audit AI specializing in Maharashtra MSEDCL electricity bills. 
+              Extract the following fields as JSON from the provided bill:
               - consumerName (string)
-              - consumerNo (string)
+              - consumerNo (string, 12 digits usually)
+              - billingUnit (string, the 'BU' code, usually 4 digits)
               - fixedCharges (number)
-              - sanctionedLoad (number, in kW. Output ONLY the number, strip 'KW' or ' kW')
-              - connectionType (string, e.g., '90/ LT I Res 1-Phase')
+              - sanctionedLoad (number, in kW. If in HP, convert: 1 HP = 0.746 kW. Output ONLY the number)
+              - connectionType (string, e.g., '90/LT I Res 1-Phase')
               - billAmount (number)
-              - billingHistory (array of exactly 12 objects with 'month' (YYYY-MM) and 'units' (number)). Try to extract the last 12 months of consumption history if a chart or table is present.
-
-              Reply with ONLY the raw JSON object, no markdown formatting like \`\`\`json.
+              - billingHistory (array of exactly 12 objects with 'month' (YYYY-MM) and 'units' (number)). 
+              
+              Note: Look specifically for the consumption table or bar chart usually found on the second page or the right sidebar of MSEDCL bills.
+              Reply with ONLY the raw JSON object, no markdown formatting.
               `
             },
             {
               type: "image_url",
-              image_url: {
-                url: `data:${file.type};base64,${base64Image}`,
-              },
+              image_url: { url: `data:${file.type};base64,${base64Image}` },
             },
           ],
         },
@@ -84,8 +83,7 @@ export async function POST(req: NextRequest) {
     const content = response.choices[0].message.content;
     if (!content) throw new Error("No content from OpenAI");
 
-    const json = JSON.parse(content);
-    return NextResponse.json(json);
+    return NextResponse.json(JSON.parse(content));
 
   } catch (error: any) {
     console.error("Extraction error:", error);
