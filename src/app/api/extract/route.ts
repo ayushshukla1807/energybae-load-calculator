@@ -51,9 +51,20 @@ export async function POST(req: NextRequest) {
           }
         `;
 
-        // Note: For a real implementation with images, we'd send the buffer. 
-        // Here we simulate high-fidelity text extraction.
-        const result = await model.generateContent(prompt + "\n\n[SIMULATED BILL PAYLOAD]");
+        // Convert file to base64 for Gemini multimodal input
+        let filePart: any = null;
+        if (file) {
+           const buffer = Buffer.from(await file.arrayBuffer());
+           filePart = {
+             inlineData: {
+               data: buffer.toString('base64'),
+               mimeType: file.type || "application/pdf"
+             }
+           };
+        }
+
+        const promptPayload = filePart ? [prompt, filePart] : [prompt, "No file provided. Return empty schema."];
+        const result = await model.generateContent(promptPayload as any);
         const response = await result.response;
         const text = response.text();
         const jsonMatch = text.match(/\{[\s\S]*\}/);

@@ -267,9 +267,19 @@ export default function EnergyBaeDashboard() {
                 </div>
               </motion.div>
 
-              <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="relative">
+              <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="relative mt-10 lg:mt-0">
                 <div className="absolute inset-0 bg-yellow-500/10 blur-[120px] rounded-full" />
-                <Image src="/hero-3d.png" alt="Hybrid Unit" width={800} height={800} className="relative z-10" />
+                <div className="relative rounded-[3rem] overflow-hidden border-2 border-white/5 shadow-2xl shadow-yellow-500/20 group">
+                   <Image src="/solar-array.png" alt="Solar Analytics Array" width={800} height={800} className="relative z-10 w-full h-[600px] object-cover transition-transform duration-1000 group-hover:scale-105" />
+                   <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-[#020617]/50 to-transparent z-20" />
+                   <div className="absolute bottom-10 left-10 z-30">
+                      <div className="flex items-center gap-3 mb-2">
+                         <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
+                         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Live Telemetry Active</span>
+                      </div>
+                      <h3 className="text-3xl font-black text-white leading-none">Global Array</h3>
+                   </div>
+                </div>
               </motion.div>
             </div>
           ) : (
