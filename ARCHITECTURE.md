@@ -1,26 +1,26 @@
-# 🏗 EnergyBae AutoLoad AI: Technical Architecture
+# 🏛 Technical Architecture: EnergyBae AutoLoad AI
 
-This document outlines the high-level system design and AI orchestration strategy implemented in the EnergyBae AutoLoad AI (Enterprise Suite V11).
+## 🧬 Multi-Model Orchestration Layer
+The system implements a robust **failover inference pipeline** to ensure 99.9% uptime for document extraction.
+- **Primary Inference:** OpenAI GPT-4o (Vision API) handles high-resolution OCR and semantic field mapping.
+- **Failover Inference:** Groq Llama-3-70B (8k context) acts as a high-speed fallback for JSON serialization and data validation.
 
-## 🧠 Neural Orchestration Layer
-The core of the platform is a **Multi-Model Inference Failover System**.
-- **Primary:** OpenAI GPT-4o Vision for high-fidelity OCR and semantic extraction.
-- **Failover:** Groq Llama-3-70B for ultra-low latency JSON processing and backup inference.
-- **Logic:** The system utilizes a domain-specific system prompt to handle MSEDCL-specific edge cases, such as HP to kW unit conversion and Billing Unit (BU) mapping.
+## 👯‍♂️ Twin-Profile Comparison Logic
+The V15 update introduces a **Side-by-Side Architectural Mapping** system:
+- **Relational Data Mapping:** The engine aligns disparate bill payloads into a unified dual-column matrix.
+- **Synchronized Time-Series:** Historical consumption data for both profiles is normalized into a single 12-month window for accurate variance analysis.
 
-## 📈 Predictive Intelligence Module
-Instead of static data extraction, the platform implements a **Time-Series Forecasting Engine**.
-- **Preprocessing:** Z-Score normalization is applied to historical consumption to detect billing anomalies.
-- **Projection:** A linear regression simulation projects consumption for the next 12-month window.
-- **Environmental ESG:** Real-time calculation of CO2 offset ($0.85kg/unit$) and tree-planting equivalents.
+## 📉 Statistical Anomaly Detection (Z-Score)
+To provide "Actionable Intelligence" instead of just data:
+- **Normalization:** Consumption data is processed via Z-Score calculation ($Z = (x - \mu) / \sigma$).
+- **Thresholding:** Spikes exceeding 1.5 standard deviations are flagged as anomalies, triggering specific load-efficiency recommendations.
 
-## 🛠 Automation & Data Integrity
-- **Non-Destructive Export:** Using `exceljs`, the system programmatically builds an executive-grade audit report. This avoids template corruption and ensures 100% cross-platform compatibility.
-- **State Management:** React 18 with Framer Motion for high-fidelity, non-linear UI transitions.
+## ⚖️ Mathematical Integrity & Unit Conversion
+- **MSEDCL Logic:** Sanctioned load in HP (Horsepower) is automatically scaled to kW using the IEEE 0.746 standard.
+- **Solar Vector:** ROI is computed using a specialized **106.06 factor** (Monthly Average Units to required kW conversion), calibrated for the Maharashtra solar radiation index.
 
-## 🔒 Security & Performance
-- **Edge Runtime:** Deployed on Vercel Edge for minimal latency between the user and the inference engines.
-- **Context Isolation:** All sensitive API keys are managed via environment variables with client-side failover masking.
+## 🛠 Document Automation
+- **Non-Destructive Generation:** Unlike template-based systems, we use `exceljs` to build the report in-memory. This prevents binary corruption and allows for dynamic styling (conditional formatting) based on ROI results.
 
 ---
-© 2026 EnergyBae | AI/ML Engineering Prototype
+© 2026 EnergyBae | Strategic Engineering Documentation

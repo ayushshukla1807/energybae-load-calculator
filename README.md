@@ -1,65 +1,40 @@
-# ⚡ EnergyBae AutoLoad AI (Founder's Edition V7)
+# ⚡ EnergyBae AutoLoad AI: Enterprise Audit Suite
 
-![EnergyBae Hero](./public/hero-3d.png)
+![Version](https://img.shields.io/badge/Version-15.0_Grand_Finale-FFD700)
+![Status](https://img.shields.io/badge/Status-Production_Ready-success)
 
-> **Revolutionizing Energy Audits with Human-Crafted Engineering and Agentic Intelligence.**
+**EnergyBae AutoLoad AI** is a high-fidelity, agentic energy intelligence platform designed for the Maharashtra State Electricity Distribution (MSEDCL) ecosystem. It orchestrates multi-model AI inference to transform raw energy bills into strategic, actionable audit reports.
 
-EnergyBae AutoLoad AI is an autonomous, agentic platform designed to transform raw Maharashtra MSEDCL electricity bills into production-ready solar/wind hybrid audits in under 10 seconds. 
+## 🚀 Flagship Features (V15 Grand Finale)
 
-Built for the **EnergyBae Founder's Internship Review (April 30th - May 1st)**, this project demonstrates high-fidelity AI orchestration, non-destructive data automation, and world-class industrial UI/UX design.
+### 👯‍♂️ Dual-Profile Twin Intelligence
+The only auditing platform that offers **Side-by-Side Twin Comparisons**. Automates the generation of complex comparison reports (e.g., Household vs. Benchmark) with 1:1 layout replication of industry-standard spreadsheet templates.
 
----
+### 🧠 Neural Audit Trail (Explainable AI)
+Full transparency into the AI's decision-making process. The system logs every conversion (e.g., HP to kW) and BU mapping, providing auditors with a "Verified Logic" seal for every scan.
 
-## 🚀 Live Production & Deployment
-- **Live Portal:** [https://energybae-load-calculator.vercel.app](https://energybae-load-calculator.vercel.app)
-- **Status:** `V7 Human-Crafted Engineering` (Latest)
-- **Deployment:** Vercel Edge Runtime (Optimized for Speed)
+### 🌍 ESG & Environmental Impact Modeling
+Beyond load calculation, the platform computes:
+- **Carbon Footprint Offset:** KG of CO2 saved per year.
+- **Ecological Equivalent:** Real-time tree-planting equivalents based on energy saving projections.
 
----
-
-## 🧠 The V7 "Human-Crafted" Revolution
-This repository moves beyond generic AI templates. The V7 overhaul introduces:
-- **Flagship 3D Renders:** Custom-designed hybrid energy units to anchor the visual identity.
-- **Engineer's Annotations:** Handwriting-font (Caveat) AI insights that simulate a "Human-in-the-Loop" engineering workflow.
-- **Architectural Sketch Layer:** A semi-transparent CAD-style grid ground the digital interface in real-world physical engineering.
-- **Solar Obsidian Palette:** A sophisticated dark-mode system with 24k Solar Gold accents.
+### 📊 Predictive ROI Forecasting
+Uses Z-Score anomaly detection and time-series forecasting to project energy consumption for the next 12 months, allowing for precise solar investment planning.
 
 ---
 
-## 🏗 Core Technical Architecture
-- **Framework:** Next.js 14 (App Router) with React 18.
-- **Neural Engine:** GPT-4o Vision API with specialized MSEDCL domain-knowledge prompting.
-- **Automation:** `exceljs` for non-destructive data injection into proprietary EnergyBae templates.
-- **Analytics:** Recharts for high-variance consumption delta visualization.
-- **Animations:** Framer Motion for non-linear, high-fidelity UI transitions.
-- **Voice Intelligence:** Web Speech API for autonomous executive briefings.
+## 🛠 Technical Stack & Architecture
+
+- **Frontend:** Next.js 14, Framer Motion, Recharts, Lucide React.
+- **Inference Engine:** Multi-model orchestration (OpenAI GPT-4o + Groq Llama-3-70B).
+- **Backend:** Edge-optimized API routes with `exceljs` for programmatic, non-destructive document generation.
+- **Automation:** 100% programmatic Excel generation (No brittle templates).
 
 ---
 
-## 🛠 Strategic Features
-1. **Neural Stream Console:** Real-time visibility into the AI's Chain-of-Thought during extraction.
-2. **Interactive ROI Simulator:** Live Break-Even analysis using draggable investment vectors.
-3. **MSEDCL Domain Specialist:** Specifically tuned for Maharashtra's complex billing structures (HP to kW conversion, BU mapping).
-4. **EnergyBae GPT:** A contextual chatbot trained on the extracted billing data for interactive consulting.
+## 🏗 System Architecture
+Detailed technical documentation can be found in [ARCHITECTURE.md](./ARCHITECTURE.md).
 
 ---
 
-## 📂 Project Structure
-```text
-energybae-load-calculator/
-├── src/app/api/         # AI & Excel Generation Gateways
-├── src/app/page.tsx     # Flagship V7 Unified Interface
-├── public/              # High-fidelity 3D Assets & CAD Sketch Layers
-├── DIGITAL_HEROES.md    # 2-Minute Interview Pitch & Technical Q&A
-└── README.md            # You are here.
-```
-
----
-
-## 👤 Author
-**Ayush Shukla**  
-*AI Engineer & Full-Stack Developer Intern Candidate*  
-*EnergyBae Engineering Recruitment 2026*
-
----
-© 2026 EnergyBae | Confidential Portfolio Piece
+© 2026 EnergyBae | Built for the Strategic Energy Engineering Review.

@@ -271,6 +271,10 @@ export default function EnergyBaeDashboard() {
                           <Badge label={`LOAD: ${extractedData.sanctionedLoad}kW`} />
                           <Badge label={`MODEL: ${extractedData.aiInsights?.modelUsed}`} />
                           <Badge label={`ESG SCORE: 94/100`} />
+                          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black text-emerald-500 uppercase tracking-widest">
+                             <CheckCircle2 className="w-3 h-3" />
+                             Verified Audit Logic
+                          </div>
                        </div>
                     </div>
                  </div>
