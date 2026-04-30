@@ -7,7 +7,7 @@ import {
   Wind, TreeDeciduous, Leaf, ShieldCheck, UserCircle2, Info, BrainCircuit,
   MessageSquare, TrendingUp, Sparkles, Box, ShieldAlert, Terminal, Activity,
   Lock, Globe, Cpu, Database, Network, Play, Volume2, Send, X, Bot, Rocket, Layers,
-  Fingerprint, Eye, Radio, Waveform as WaveformIcon
+  Fingerprint, Eye, Radio, AudioLines
 } from "lucide-react";
 import clsx from "clsx";
 import { 
