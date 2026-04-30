@@ -77,7 +77,7 @@ export default function EnergyBaeDashboard() {
   const triggerInitialChat = () => {
      if (chatHistory.length === 0) {
         setTimeout(() => {
-           setChatHistory([{ role: 'bot', text: "Neural Extraction Complete. I am your Engineer GPT. I have mapped the MSEDCL tariff structures to the anomaly vectors. How can I assist you with the technical audit today?" }]);
+           setChatHistory([{ role: 'bot', text: "Neural Extraction Complete. I am your EnergyBae Assistant. I have mapped the MSEDCL tariff structures to the anomaly vectors. How can I assist you with the technical audit today?" }]);
         }, 500);
      }
   }
@@ -100,9 +100,9 @@ export default function EnergyBaeDashboard() {
     setChatMessage("");
 
     setTimeout(() => {
-      let botResponse = "Running K-Means clustering on the load profile... Analysis indicates a 1.4x variance threshold breach during summer months. Recommend immediate integration of Hybrid VAWT (Vertical Axis Wind Turbines) to flatten the peak curve. Estimated efficiency gain: 18.4%.";
+      let botResponse = "Based on the extracted data, the summer months show a higher load consumption. A 3.6kW system is recommended for optimal savings.";
       if (userMsg.toLowerCase().includes("save") || userMsg.toLowerCase().includes("roi")) {
-        botResponse = `Predictive Machine Learning model (XGBoost Regressor) projects an annual savings of ₹${(extractedData?.billAmount || 3490) * 12 * 0.72} with a 94.2% confidence interval if the 3.6kW solar array is deployed.`;
+        botResponse = `Calculations project an estimated annual savings of ₹${Math.round((extractedData?.billAmount || 3490) * 12 * 0.72)} if the recommended solar array is deployed.`;
       }
       setChatHistory(prev => [...prev, { role: 'bot', text: botResponse }]);
     }, 1200);
@@ -120,13 +120,13 @@ export default function EnergyBaeDashboard() {
     setExtractedData(null);
 
     try {
-      setAgentThoughts(prev => [...prev, { type: 'vision', message: `Initializing Computer Vision Module [${selectedModel.toUpperCase()}]...`, confidence: 1.0 }]);
+      setAgentThoughts(prev => [...prev, { type: 'vision', message: `Initializing document processor...`, confidence: 1.0 }]);
       await new Promise(r => setTimeout(r, 800));
-      setAgentThoughts(prev => [...prev, { type: 'extract', message: "OCR Engine: Parsing Document Entropy & Bounding Boxes...", confidence: 0.98 }]);
+      setAgentThoughts(prev => [...prev, { type: 'extract', message: "Parsing document text regions...", confidence: 0.98 }]);
       await new Promise(r => setTimeout(r, 1000));
-      setAgentThoughts(prev => [...prev, { type: 'validate', message: "RAG Agent: Cross-referencing BU Code 4393 with MSEDCL Database...", confidence: 0.96 }]);
+      setAgentThoughts(prev => [...prev, { type: 'validate', message: "Validating MSEDCL structures...", confidence: 0.96 }]);
       await new Promise(r => setTimeout(r, 1200));
-      setAgentThoughts(prev => [...prev, { type: 'predict', message: "Machine Learning: Generating 12-Month Time-Series Forecast...", confidence: 0.99 }]);
+      setAgentThoughts(prev => [...prev, { type: 'predict', message: "Generating output file...", confidence: 0.99 }]);
       await new Promise(r => setTimeout(r, 800));
 
       const formData = new FormData();
@@ -199,17 +199,10 @@ export default function EnergyBaeDashboard() {
           </div>
           <div>
             <h1 className="text-3xl font-black tracking-tighter uppercase leading-none text-foreground">EnergyBae</h1>
-            <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mt-1">Enterprise AI Suite V19.0</p>
+            <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mt-1">Solar Audit Automation Tool</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-           <ThemeToggle />
-           <div className="hidden md:flex items-center gap-2 p-1 bg-card border border-border rounded-full">
-              <button onClick={() => setSelectedModel('gemini')} className={clsx("px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", selectedModel === 'gemini' ? "bg-yellow-500 text-background dark:text-black shadow-lg shadow-yellow-500/20" : "text-muted-foreground hover:text-foreground")}>Gemini 1.5</button>
-              <button onClick={() => setSelectedModel('llama')} className={clsx("px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", selectedModel === 'llama' ? "bg-white text-background dark:text-black shadow-lg" : "text-muted-foreground hover:text-foreground")}>Llama-3-70B</button>
-              <button onClick={() => setSelectedModel('claude')} className={clsx("px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all", selectedModel === 'claude' ? "bg-blue-500 text-foreground shadow-lg shadow-blue-500/20" : "text-muted-foreground hover:text-foreground")}>Sonnet 3.5</button>
-           </div>
-        </div>
+        <ThemeToggle />
 
         <div className="flex items-center gap-10">
           <NavInfo label="Model Status" value="Online / 14ms" />
@@ -283,7 +276,7 @@ export default function EnergyBaeDashboard() {
                    {isExtracting && (
                       <div className="absolute inset-0 z-30 flex flex-col items-center justify-center">
                          <div className="w-32 h-32 rounded-full border border-yellow-500/30 border-t-yellow-500 animate-spin mb-8" />
-                         <p className="text-yellow-500 font-mono text-sm tracking-[0.3em] uppercase animate-pulse">Vision Parsing Map...</p>
+                         <p className="text-yellow-500 font-mono text-sm tracking-[0.3em] uppercase animate-pulse">Processing Document...</p>
                          <div className="absolute w-full h-[2px] bg-yellow-500/50 animate-beam-move" />
                       </div>
                    )}
@@ -291,7 +284,7 @@ export default function EnergyBaeDashboard() {
                    <div className="absolute bottom-10 left-10 z-30 w-full pr-20">
                       <div className="flex items-center gap-3 mb-4">
                          <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-                         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Live AI Telemetry</span>
+                         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">System Status</span>
                       </div>
                       
                       {isExtracting ? (
@@ -299,10 +292,10 @@ export default function EnergyBaeDashboard() {
                            <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
                               <div className="h-full bg-yellow-500 w-1/3 animate-[pulse_2s_ease-in-out_infinite]" />
                            </div>
-                           <p className="text-[9px] font-mono text-muted-foreground">Agent Orchestration Graph Building...</p>
+                           <p className="text-[9px] font-mono text-muted-foreground">Extracting electricity bill fields...</p>
                          </div>
                       ) : (
-                         <h3 className="text-3xl font-black text-foreground leading-none">Global Array Cluster</h3>
+                         <h3 className="text-3xl font-black text-foreground leading-none">Audit Workspace</h3>
                       )}
                    </div>
                 </div>
@@ -370,27 +363,27 @@ export default function EnergyBaeDashboard() {
                       <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="glass-card p-10 rounded-[3rem] bg-yellow-500/5 border border-yellow-500/20 overflow-hidden">
                          <div className="flex items-center gap-4 mb-6">
                             <History className="w-5 h-5 text-yellow-500" />
-                            <h3 className="text-sm font-black uppercase tracking-widest">Agent Orchestration Trail</h3>
+                            <h3 className="text-sm font-black uppercase tracking-widest">Processing Pipeline</h3>
                          </div>
                          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 font-mono text-[10px] opacity-80">
                             <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-                               <p className="text-emerald-500 mb-2 font-bold">1. VISION PARSER</p>
-                               <p>Engine: {selectedModel.toUpperCase()}</p>
+                               <p className="text-emerald-500 mb-2 font-bold">1. DOCUMENT SCAN</p>
+                               <p>Engine: OCR Core</p>
                                <p>Confidence: 0.99</p>
                             </div>
                             <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-                               <p className="text-emerald-500 mb-2 font-bold">2. RAG GROUNDING</p>
+                               <p className="text-emerald-500 mb-2 font-bold">2. DATA PARSING</p>
                                <p>Target: BU 4393</p>
                                <p>Match: 100%</p>
                             </div>
                             <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-                               <p className="text-emerald-500 mb-2 font-bold">3. MATH AGENT</p>
+                               <p className="text-emerald-500 mb-2 font-bold">3. CALCULATIONS</p>
                                <p>Scaling HP to kW</p>
                                <p>Factor: IEEE 0.746</p>
                             </div>
                             <div className="p-4 bg-yellow-500/10 rounded-2xl border border-yellow-500/20">
-                               <p className="text-yellow-500 mb-2 font-bold">4. ML FORECAST</p>
-                               <p>Model: XGBoost</p>
+                               <p className="text-yellow-500 mb-2 font-bold">4. EXCEL GEN</p>
+                               <p>Model: Template Mapper</p>
                                <p>Status: Active</p>
                             </div>
                          </div>
@@ -405,7 +398,7 @@ export default function EnergyBaeDashboard() {
                           
                           <div className="relative z-10 w-full max-w-2xl bg-background/80 p-8 rounded-[2rem] border border-border backdrop-blur-md">
                              <h3 className="text-xl font-black flex items-center gap-4 mb-6 text-yellow-500">
-                                <ScanFace className="w-6 h-6" /> Deep Vision Heatmap (Simulated)
+                                <ScanFace className="w-6 h-6" /> Document Extraction Analysis
                              </h3>
                              <div className="grid grid-cols-2 gap-4">
                                 <div className="p-4 border border-emerald-500/30 bg-emerald-500/5 rounded-xl">
@@ -433,8 +426,8 @@ export default function EnergyBaeDashboard() {
                           <div className="flex items-center gap-4 mb-6 px-4">
                              <Bot className="w-6 h-6 text-yellow-500" />
                              <div>
-                               <h3 className="text-xl font-black">Engineer GPT</h3>
-                               <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Agent Online</p>
+                               <h3 className="text-xl font-black">EnergyBae Assistant</h3>
+                               <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Online</p>
                              </div>
                           </div>
                           
@@ -445,7 +438,7 @@ export default function EnergyBaeDashboard() {
                                     {msg.text}
                                   </div>
                                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 mt-2">
-                                    {msg.role === 'user' ? 'Auditor' : 'AI Engineer'}
+                                    {msg.role === 'user' ? 'Auditor' : 'System'}
                                   </span>
                                </div>
                              ))}
@@ -458,7 +451,7 @@ export default function EnergyBaeDashboard() {
                                value={chatMessage}
                                onChange={(e) => setChatMessage(e.target.value)}
                                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                               placeholder="Ask the AI Engineer for technical optimization strategies..."
+                               placeholder="Ask questions about the audit..."
                                className="flex-1 bg-card border border-border rounded-[2rem] px-8 py-4 outline-none focus:border-yellow-500/50 transition-colors"
                              />
                              <button onClick={handleSendMessage} className="w-16 h-16 rounded-[2rem] bg-yellow-500 flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-background dark:text-black">
@@ -550,7 +543,7 @@ export default function EnergyBaeDashboard() {
       <footer className="relative z-50 p-12 flex justify-between items-center opacity-30 text-[10px] font-black uppercase tracking-widest">
          <div className="flex items-center gap-3">
             <Lock className="w-3 h-3 text-emerald-500" />
-            <span>AI Engineer Prototype V16.0</span>
+            <span>System Prototype V16.0</span>
          </div>
          <div className="flex gap-10">
             <span>Orchestration: Gemini 1.5 Flash</span>

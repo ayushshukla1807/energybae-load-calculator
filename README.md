@@ -1,40 +1,46 @@
-# ⚡ EnergyBae AutoLoad AI: Enterprise Audit Suite
+# EnergyBae Solar Load Calculator
 
-![Version](https://img.shields.io/badge/Version-15.0_Grand_Finale-FFD700)
-![Status](https://img.shields.io/badge/Status-Production_Ready-success)
+A full-stack automation tool designed to streamline the energy auditing process by automatically extracting data from electricity bills and populating calculation spreadsheets. Built for the EnergyBae AI Engineering assessment.
 
-**EnergyBae AutoLoad AI** is a high-fidelity, agentic energy intelligence platform designed for the Maharashtra State Electricity Distribution (MSEDCL) ecosystem. It orchestrates multi-model AI inference to transform raw energy bills into strategic, actionable audit reports.
+## Features
 
-## 🚀 Flagship Features (V15 Grand Finale)
+- **Automated Data Extraction**: Utilizes multimodal OCR (Google Gemini 1.5 Flash) to accurately read and parse key fields from uploaded electricity bills (PDF/Images).
+- **Template Integration**: Directly injects extracted data (Consumer Details, Sanctioned Load, 12-Month Billing History) into the provided Excel template without modifying existing proprietary formulas.
+- **Modern UI**: Clean, responsive dashboard built with Next.js and Tailwind CSS featuring Light/Dark mode support for optimal user experience.
 
-### 👯‍♂️ Dual-Profile Twin Intelligence
-The only auditing platform that offers **Side-by-Side Twin Comparisons**. Automates the generation of complex comparison reports (e.g., Household vs. Benchmark) with 1:1 layout replication of industry-standard spreadsheet templates.
+## Tech Stack
 
-### 🧠 Neural Audit Trail (Explainable AI)
-Full transparency into the AI's decision-making process. The system logs every conversion (e.g., HP to kW) and BU mapping, providing auditors with a "Verified Logic" seal for every scan.
+- **Frontend**: Next.js 14 (App Router), React, Tailwind CSS, Lucide React
+- **Backend**: Next.js API Routes (Serverless)
+- **Data Processing**: ExcelJS for robust `.xlsx` manipulation
+- **AI/ML Integration**: Google Generative AI SDK (`@google/generative-ai`)
 
-### 🌍 ESG & Environmental Impact Modeling
-Beyond load calculation, the platform computes:
-- **Carbon Footprint Offset:** KG of CO2 saved per year.
-- **Ecological Equivalent:** Real-time tree-planting equivalents based on energy saving projections.
+## Local Setup
 
-### 📊 Predictive ROI Forecasting
-Uses Z-Score anomaly detection and time-series forecasting to project energy consumption for the next 12 months, allowing for precise solar investment planning.
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/ayushshukla1807/energybae-load-calculator.git
+   ```
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+3. Set up your environment variables by creating a `.env.local` file:
+   ```env
+   GOOGLE_GENERATIVE_AI_API_KEY=your_gemini_api_key_here
+   ```
+4. Run the development server:
+   ```bash
+   npm run dev
+   ```
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Workflow
+
+1. Upload an electricity bill (PDF or Image format).
+2. The backend connects to the extraction engine to parse the document.
+3. The server loads `public/template.xlsx` and writes the extracted metrics into the exact input cells required by the EnergyBae workflow.
+4. The user receives a download prompt for the finalized, populated Excel sheet.
 
 ---
-
-## 🛠 Technical Stack & Architecture
-
-- **Frontend:** Next.js 14, Framer Motion, Recharts, Lucide React.
-- **Inference Engine:** Multi-model orchestration (OpenAI GPT-4o + Groq Llama-3-70B).
-- **Backend:** Edge-optimized API routes with `exceljs` for programmatic, non-destructive document generation.
-- **Automation:** 100% programmatic Excel generation (No brittle templates).
-
----
-
-## 🏗 System Architecture
-Detailed technical documentation can be found in [ARCHITECTURE.md](./ARCHITECTURE.md).
-
----
-
-© 2026 EnergyBae | Built for the Strategic Energy Engineering Review.
+*Developed by Ayush Shukla*
