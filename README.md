@@ -1,56 +1,65 @@
-# EnergyBae AutoLoad AI (V3.0 Ultimate)
+# ⚡ EnergyBae AutoLoad AI (Founder's Edition V7)
 
-[![Live Demo](https://img.shields.io/badge/Live-Demo-brightgreen)](https://energybae-load-calculator.vercel.app)
-[![GitHub](https://img.shields.io/badge/GitHub-Repository-blue)](https://github.com/ayushshukla1807/energybae-load-calculator)
-[![Next.js](https://img.shields.io/badge/Next.js-14-black)](https://nextjs.org/)
-[![OpenAI](https://img.shields.io/badge/AI-GPT--4o--Vision-orange)](https://openai.com/)
+![EnergyBae Hero](./public/hero-3d.png)
 
-An Enterprise-grade Agentic Document Intelligence platform built for **EnergyBae**. This application revolutionizes residential and industrial energy auditing by combining high-fidelity OCR, neural forecasting, and a proprietary "Golden Ratio" recommendation engine.
+> **Revolutionizing Energy Audits with Human-Crafted Engineering and Agentic Intelligence.**
 
-## 🚀 The Revolution
+EnergyBae AutoLoad AI is an autonomous, agentic platform designed to transform raw Maharashtra MSEDCL electricity bills into production-ready solar/wind hybrid audits in under 10 seconds. 
 
-This isn't just a calculator. It is a **Strategic Energy Advisor** that:
-- **Neural Extraction:** Uses GPT-4o Vision to extract billing data with >95% accuracy.
-- **Agentic Auditor:** A real-time "Neural Stream" console that shows the AI's Chain-of-Thought during processing.
-- **Neural Forecaster:** Predicts next-quarter consumption using weighted seasonal regression models.
-- **Golden Ratio Engine:** Recommends the optimal mix of Solar and Wind (HAWT/VAWT) based on historical load variance.
-- **Human-in-the-Loop:** A professional verification dashboard to ensure 100% data integrity before Excel generation.
-
-## 🛠 Tech Stack
-
-- **Framework:** Next.js 14 (App Router)
-- **Styling:** Tailwind CSS + Framer Motion (Glassmorphism UI)
-- **AI/ML:** OpenAI API (Vision Models) + Custom Regression Logic
-- **Data Visualization:** Recharts (Analytics & Forecasting)
-- **Document Processing:** `exceljs` (Surgical Excel Injection)
-- **Icons:** Lucide-React
-
-## 🏗 Architecture
-
-```mermaid
-graph TD
-    A[User Uploads Bill] --> B[Neural Extraction Agent]
-    B --> C[GPT-4o Vision Processing]
-    C --> D[Confidence Heatmap & Verification]
-    D --> E[Golden Ratio Engine]
-    E --> F[Hardware Recommendations]
-    F --> G[Predictive Neural Forecaster]
-    G --> H[Export to Verified Excel]
-```
-
-## 🔋 Hardware Recommendations
-
-The platform is vertically integrated with the **EnergyBae Catalog**:
-- **Windistar 400 HAWT/VAWT** for residential base loads.
-- **Whisper 200/500** for industrial consistency.
-- **Tier 1 Monocrystalline PERC** for peak solar efficiency.
-
-## 📦 Getting Started
-
-1. Clone the repository
-2. Install dependencies: `npm install`
-3. Set your `OPENAI_API_KEY` in `.env.local`
-4. Run development server: `npm run dev`
+Built for the **EnergyBae Founder's Internship Review (April 30th - May 1st)**, this project demonstrates high-fidelity AI orchestration, non-destructive data automation, and world-class industrial UI/UX design.
 
 ---
-*Built for the EnergyBae AI Engineer Internship.*
+
+## 🚀 Live Production & Deployment
+- **Live Portal:** [https://energybae-load-calculator.vercel.app](https://energybae-load-calculator.vercel.app)
+- **Status:** `V7 Human-Crafted Engineering` (Latest)
+- **Deployment:** Vercel Edge Runtime (Optimized for Speed)
+
+---
+
+## 🧠 The V7 "Human-Crafted" Revolution
+This repository moves beyond generic AI templates. The V7 overhaul introduces:
+- **Flagship 3D Renders:** Custom-designed hybrid energy units to anchor the visual identity.
+- **Engineer's Annotations:** Handwriting-font (Caveat) AI insights that simulate a "Human-in-the-Loop" engineering workflow.
+- **Architectural Sketch Layer:** A semi-transparent CAD-style grid ground the digital interface in real-world physical engineering.
+- **Solar Obsidian Palette:** A sophisticated dark-mode system with 24k Solar Gold accents.
+
+---
+
+## 🏗 Core Technical Architecture
+- **Framework:** Next.js 14 (App Router) with React 18.
+- **Neural Engine:** GPT-4o Vision API with specialized MSEDCL domain-knowledge prompting.
+- **Automation:** `exceljs` for non-destructive data injection into proprietary EnergyBae templates.
+- **Analytics:** Recharts for high-variance consumption delta visualization.
+- **Animations:** Framer Motion for non-linear, high-fidelity UI transitions.
+- **Voice Intelligence:** Web Speech API for autonomous executive briefings.
+
+---
+
+## 🛠 Strategic Features
+1. **Neural Stream Console:** Real-time visibility into the AI's Chain-of-Thought during extraction.
+2. **Interactive ROI Simulator:** Live Break-Even analysis using draggable investment vectors.
+3. **MSEDCL Domain Specialist:** Specifically tuned for Maharashtra's complex billing structures (HP to kW conversion, BU mapping).
+4. **EnergyBae GPT:** A contextual chatbot trained on the extracted billing data for interactive consulting.
+
+---
+
+## 📂 Project Structure
+```text
+energybae-load-calculator/
+├── src/app/api/         # AI & Excel Generation Gateways
+├── src/app/page.tsx     # Flagship V7 Unified Interface
+├── public/              # High-fidelity 3D Assets & CAD Sketch Layers
+├── DIGITAL_HEROES.md    # 2-Minute Interview Pitch & Technical Q&A
+└── README.md            # You are here.
+```
+
+---
+
+## 👤 Author
+**Ayush Shukla**  
+*AI Engineer & Full-Stack Developer Intern Candidate*  
+*EnergyBae Engineering Recruitment 2026*
+
+---
+© 2026 EnergyBae | Confidential Portfolio Piece
