@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Outfit, JetBrains_Mono, Caveat } from "next/font/google";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -10,6 +10,11 @@ const outfit = Outfit({
 
 const jetbrains = JetBrains_Mono({
   variable: "--font-jetbrains",
+  subsets: ["latin"],
+});
+
+const caveat = Caveat({
+  variable: "--font-handwriting",
   subsets: ["latin"],
 });
 
@@ -26,7 +31,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${jetbrains.variable} h-full antialiased selection:bg-blue-500/30`}
+      className={`${outfit.variable} ${jetbrains.variable} ${caveat.variable} h-full antialiased selection:bg-yellow-500/30`}
     >
       <body className="min-h-full flex flex-col font-sans bg-[#020617] text-slate-100">{children}</body>
     </html>
