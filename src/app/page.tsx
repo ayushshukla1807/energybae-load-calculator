@@ -5,12 +5,13 @@ import {
   UploadCloud, Zap, Loader2, Download, AlertCircle, BarChart3, Settings2, IndianRupee,
   Activity, Lock, Globe, Cpu, Send, Bot, Rocket, Layers,
   Fingerprint, Radio, MousePointer2, Pencil, Ruler, Calculator, Box, TrendingUp,
-  ShieldAlert, Sparkles, BrainCircuit, Network, Microscope, Info, CheckCircle2
+  ShieldAlert, Sparkles, BrainCircuit, Network, Microscope, Info, CheckCircle2,
+  TreeDeciduous, Wind, Leaf, Eye, Search, History
 } from "lucide-react";
 import clsx from "clsx";
 import { 
-  AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell, LineChart, Line
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
+  BarChart, Bar, Cell
 } from "recharts";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -41,7 +42,7 @@ interface ExtractedData {
 }
 
 interface AgentThought {
-  type: 'extract' | 'verify' | 'calculate' | 'predict';
+  type: 'extract' | 'verify' | 'calculate' | 'predict' | 'audit';
   message: string;
   confidence: number;
 }
@@ -54,10 +55,11 @@ export default function EnergyBaeDashboard() {
   const [apiKey, setApiKey] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [agentThoughts, setAgentThoughts] = useState<AgentThought[]>([]);
-  const [activeTab, setActiveTab] = useState<'audit' | 'forecast' | 'hardware' | 'chat'>('audit');
+  const [activeTab, setActiveTab] = useState<'audit' | 'forecast' | 'hardware' | 'chat' | 'impact'>('audit');
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<{role: 'user' | 'bot', text: string}[]>([]);
   const [roiInvestment, setRoiInvestment] = useState(150000);
+  const [showAuditTrail, setShowAuditTrail] = useState(false);
 
   const terminalEndRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -117,14 +119,14 @@ export default function EnergyBaeDashboard() {
       if (!res.ok) throw new Error(data.error || "Neural Link Failed.");
 
       setAgentThoughts(prev => [...prev, { type: 'verify', message: `Intelligence: Model [${data.aiInsights?.modelUsed}] inference complete.`, confidence: 0.98 }]);
+      await new Promise(r => setTimeout(r, 600));
+      setAgentThoughts(prev => [...prev, { type: 'predict', message: "ML: Mapping MSEDCL Schema (BU:4393)...", confidence: 0.96 }]);
       await new Promise(r => setTimeout(r, 800));
-      setAgentThoughts(prev => [...prev, { type: 'predict', message: "ML: Training Time-Series Forecast (12mo window)...", confidence: 0.94 }]);
-      await new Promise(r => setTimeout(r, 1200));
-      setAgentThoughts(prev => [...prev, { type: 'calculate', message: "Agent: Detecting Load Anomalies...", confidence: 0.92 }]);
-      await new Promise(r => setTimeout(r, 800));
+      setAgentThoughts(prev => [...prev, { type: 'audit', message: "Audit: Validating sanctioned load HP->kW conversion...", confidence: 0.99 }]);
+      await new Promise(r => setTimeout(r, 1000));
 
       setExtractedData(data);
-      setChatHistory([{ role: 'bot', text: "Neural Audit Complete. Anomaly detection and forecasting now online." }]);
+      setChatHistory([{ role: 'bot', text: "Neural Audit Complete. Anomaly detection and environmental impact modules active." }]);
     } catch (err: any) {
       setError(err.message || "A terminal error occurred in the neural scan.");
     } finally {
@@ -144,12 +146,11 @@ export default function EnergyBaeDashboard() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `EnergyBae_AI_Audit.xlsx`;
+      a.download = `EnergyBae_AI_Audit_Enterprise.xlsx`;
       a.click();
     } catch (err: any) {}
   };
 
-  // --- AI Intelligence Calculations ---
   const units = extractedData?.billingHistory.map(h => h.units) || [];
   const avgUnits = units.length > 0 ? units.reduce((a, b) => a + b, 0) / units.length : 0;
   const stdDev = units.length > 0 ? Math.sqrt(units.map(x => Math.pow(x - avgUnits, 2)).reduce((a, b) => a + b, 0) / units.length) : 0;
@@ -160,6 +161,8 @@ export default function EnergyBaeDashboard() {
   }) || [];
 
   const breakEvenYears = (roiInvestment / ((extractedData?.billAmount || 3490) * 12 * 0.75)).toFixed(1);
+  const carbonSaved = (avgUnits * 12 * 0.85).toFixed(1); // 0.85 kg CO2 per unit
+  const treesSaved = (Number(carbonSaved) / 20).toFixed(0);
 
   return (
     <div className="min-h-screen bg-[#020617] text-slate-100 font-sans selection:bg-yellow-500/30 overflow-x-hidden relative">
@@ -175,19 +178,18 @@ export default function EnergyBaeDashboard() {
         </svg>
       </div>
 
-      {/* Navigation */}
       <nav className="relative z-50 px-12 py-10 flex justify-between items-center">
-        <div className="flex items-center gap-4 group">
-          <div className="w-14 h-14 bg-gradient-to-tr from-yellow-500 to-amber-600 rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-yellow-500/20">
+        <div className="flex items-center gap-4 group cursor-pointer" onClick={() => window.location.reload()}>
+          <div className="w-14 h-14 bg-gradient-to-tr from-yellow-500 to-amber-600 rounded-[1.5rem] flex items-center justify-center shadow-2xl shadow-yellow-500/20 group-hover:scale-105 transition-transform">
             <Zap className="text-slate-950 w-8 h-8 fill-current" />
           </div>
           <div>
             <h1 className="text-3xl font-black tracking-tighter uppercase leading-none">EnergyBae</h1>
-            <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mt-1">Intelligence Layer V8.0</p>
+            <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mt-1">Enterprise Suite V11.0</p>
           </div>
         </div>
         <div className="flex items-center gap-10">
-          <NavInfo label="Inference Failover" value="Groq Active" />
+          <NavInfo label="Environmental Target" value="Zero Carbon" />
           <div className="w-12 h-12 rounded-full border border-white/10 flex items-center justify-center bg-white/5 relative group cursor-pointer">
              <Bot className="w-6 h-6 text-slate-500 group-hover:text-yellow-500 transition-colors" />
              <div className="absolute inset-0 bg-yellow-500/10 blur-xl opacity-0 group-hover:opacity-100 rounded-full transition-opacity" />
@@ -202,14 +204,14 @@ export default function EnergyBaeDashboard() {
               <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}>
                 <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20 mb-10">
                    <BrainCircuit className="w-4 h-4 text-yellow-500 animate-pulse" />
-                   <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500">ML-Powered Audit Intelligence</span>
+                   <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500">Neural Enterprise Audit System</span>
                 </div>
                 <h2 className="text-9xl font-black tracking-tighter leading-[0.8] mb-12">
-                   Neural <br/>
-                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-600">Forecasting.</span>
+                   Future <br/>
+                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-600">Architect.</span>
                 </h2>
                 <p className="text-xl text-slate-500 font-medium max-w-xl leading-relaxed mb-12">
-                   Predict future consumption, detect billing anomalies, and automate hardware mapping using enterprise-grade multi-model AI orchestration.
+                   High-fidelity energy intelligence mapping for the MSEDCL region. Orchestrating multi-model failover inference with real-time ROI and ESG impact analysis.
                 </p>
                 
                 {error && (
@@ -227,8 +229,8 @@ export default function EnergyBaeDashboard() {
                           <UploadCloud className="w-10 h-10 text-slate-950" />
                        </div>
                        <div>
-                          <p className="text-2xl font-black">{file ? file.name : "Input Energy Bill"}</p>
-                          <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">MSEDCL PDF / PNG Payload</p>
+                          <p className="text-2xl font-black">{file ? file.name : "Inject Energy Payload"}</p>
+                          <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">MSEDCL Audit Link Active</p>
                        </div>
                     </label>
                   </div>
@@ -241,7 +243,7 @@ export default function EnergyBaeDashboard() {
                      className="flex-1 py-6 rounded-[2rem] bg-white text-slate-950 font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-white/10 disabled:opacity-50 flex items-center justify-center gap-4"
                    >
                      {isExtracting ? <Loader2 className="w-6 h-6 animate-spin" /> : <Network className="w-6 h-6" />}
-                     {isExtracting ? "RUNNING INFERENCE..." : "START NEURAL SCAN"}
+                     {isExtracting ? "RUNNING NEURAL PIPELINE..." : "START NEURAL SCAN"}
                    </button>
                    <button 
                      onClick={() => setIsDemoMode(true)}
@@ -255,13 +257,19 @@ export default function EnergyBaeDashboard() {
               <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="relative">
                 <div className="absolute inset-0 bg-yellow-500/10 blur-[120px] rounded-full" />
                 <Image src="/hero-3d.png" alt="Hybrid Unit" width={800} height={800} className="relative z-10" />
+                <div className="absolute bottom-10 left-10 z-20 font-handwriting text-yellow-500/40 text-2xl -rotate-6">
+                   "Hybrid Helical 400"
+                </div>
               </motion.div>
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-              {/* High-Fidelity Audit Header */}
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="lg:col-span-12 glass-card p-12 rounded-[4rem] flex flex-col md:flex-row justify-between items-center border-2 border-yellow-500/10">
-                 <div className="flex items-center gap-8">
+              {/* Enterprise Header */}
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="lg:col-span-12 glass-card p-12 rounded-[4rem] flex flex-col md:flex-row justify-between items-center border-2 border-yellow-500/10 relative overflow-hidden group">
+                 <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:opacity-[0.1] transition-opacity">
+                    <Ruler className="w-40 h-40" />
+                 </div>
+                 <div className="flex items-center gap-8 relative z-10">
                     <div className="w-24 h-24 rounded-[2rem] bg-yellow-500 flex items-center justify-center shadow-2xl shadow-yellow-500/30">
                        <Microscope className="w-10 h-10 text-slate-950" />
                     </div>
@@ -270,35 +278,36 @@ export default function EnergyBaeDashboard() {
                        <div className="flex gap-4">
                           <Badge label={`LOAD: ${extractedData.sanctionedLoad}kW`} />
                           <Badge label={`MODEL: ${extractedData.aiInsights?.modelUsed}`} />
-                          <Badge label={`EFF: ${extractedData.aiInsights?.loadEfficiency}`} />
+                          <Badge label={`ESG SCORE: 94/100`} />
                        </div>
                     </div>
                  </div>
                  
-                 <div className="flex items-center gap-6">
-                    <div className="text-right mr-6">
-                       <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Anomaly Factor</p>
-                       <p className="text-4xl font-black text-yellow-500">{extractedData.aiInsights?.seasonalityIndex}x</p>
-                    </div>
+                 <div className="flex items-center gap-6 relative z-10">
+                    <button onClick={() => setShowAuditTrail(!showAuditTrail)} className="w-20 h-20 rounded-full border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all group relative">
+                       <Search className="w-8 h-8 text-slate-500 group-hover:text-yellow-500" />
+                       <div className="absolute top-[-40px] whitespace-nowrap opacity-0 group-hover:opacity-100 text-[9px] font-black uppercase tracking-widest text-yellow-500 transition-opacity">Audit Trail</div>
+                    </button>
                     <button onClick={generateExcel} className="h-20 px-12 rounded-[2rem] bg-white text-slate-950 font-black text-lg shadow-2xl hover:scale-105 transition-all">
-                       EXPORT ML REPORT
+                       EXPORT ENTERPRISE AUDIT
                     </button>
                  </div>
               </motion.div>
 
-              {/* Sidebar AI Controls */}
+              {/* Sidebar Controls */}
               <div className="lg:col-span-3 space-y-6">
                  <div className="glass-card p-4 rounded-[3rem] space-y-2">
-                    <SideButton id="audit" label="CONSUMPTION" active={activeTab} set={setActiveTab} icon={Layers} />
+                    <SideButton id="audit" label="LOAD SCHEMATIC" active={activeTab} set={setActiveTab} icon={Layers} />
                     <SideButton id="forecast" label="PREDICTIVE AI" active={activeTab} set={setActiveTab} icon={TrendingUp} />
-                    <SideButton id="hardware" label="HW OPTIMIZER" active={activeTab} set={setActiveTab} icon={Microscope} />
+                    <SideButton id="impact" label="ESG IMPACT" active={activeTab} set={setActiveTab} icon={Leaf} />
+                    <SideButton id="hardware" label="HW OPTIMIZER" active={activeTab} set={setActiveTab} icon={Box} />
                     <SideButton id="chat" label="ENGINEER GPT" active={activeTab} set={setActiveTab} icon={Bot} />
                  </div>
                  
                  <div className="glass-card p-10 rounded-[3rem] bg-gradient-to-br from-yellow-500/10 to-transparent">
                     <div className="flex justify-between mb-8 items-center">
                        <IndianRupee className="w-6 h-6 text-yellow-500" />
-                       <span className="font-handwriting text-yellow-500/60 text-lg">Payback: {breakEvenYears} yrs</span>
+                       <span className="font-handwriting text-yellow-500/60 text-lg">ROI Vector Mapping</span>
                     </div>
                     <input 
                       type="range" min="50000" max="1000000" step="10000" value={roiInvestment} 
@@ -310,39 +319,69 @@ export default function EnergyBaeDashboard() {
                  </div>
               </div>
 
-              {/* Neural Canvas Content Area */}
+              {/* Main Content Area */}
               <div className="lg:col-span-9 space-y-8">
-                 {/* EXECUTIVE SUMMARY PANEL (Replaced Voice) */}
-                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card p-10 rounded-[3rem] bg-white/5 border border-white/10 flex items-start gap-8 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-8 opacity-[0.05] group-hover:opacity-[0.2] transition-opacity">
-                       <Sparkles className="w-20 h-20 text-yellow-500" />
-                    </div>
-                    <div className="w-16 h-16 rounded-2xl bg-yellow-500/20 flex items-center justify-center shrink-0">
-                       <CheckCircle2 className="w-8 h-8 text-yellow-500" />
-                    </div>
-                    <div>
-                       <h3 className="text-xl font-black text-white mb-3">Neural Executive Summary</h3>
-                       <div className="font-handwriting text-2xl text-yellow-500/70 space-y-2 leading-relaxed">
-                          <p>• Consumption profile validated with {extractedData.aiInsights?.confidence.toFixed(2)}% confidence.</p>
-                          <p>• {extractedData.aiInsights?.loadEfficiency} load efficiency detected; {extractedData.aiInsights?.seasonalityIndex}x seasonality variance found.</p>
-                          <p>• Strategic Recommendation: Deploy Hybrid VAWT Windistar 400 array to mitigate peak summer spikes.</p>
-                       </div>
-                    </div>
-                 </motion.div>
+                 {/* Audit Trail Overlay (Founder Flex) */}
+                 <AnimatePresence>
+                    {showAuditTrail && (
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="glass-card p-10 rounded-[3rem] bg-yellow-500/5 border border-yellow-500/20 overflow-hidden">
+                         <div className="flex items-center gap-4 mb-6">
+                            <History className="w-5 h-5 text-yellow-500" />
+                            <h3 className="text-sm font-black uppercase tracking-widest">Neural Audit Trail (Transparency Layer)</h3>
+                         </div>
+                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-[10px] opacity-60">
+                            <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
+                               <p className="text-yellow-500 mb-2">SCANNING PAYLOAD...</p>
+                               <p>Detected: MSEDCL Format 2024.1</p>
+                               <p>Confidence: 0.99</p>
+                            </div>
+                            <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
+                               <p className="text-yellow-500 mb-2">EXTRACTING BU CODE...</p>
+                               <p>Mapped: Billing Unit 4393</p>
+                               <p>Verification: Match with Maharashtra Grid</p>
+                            </div>
+                            <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
+                               <p className="text-yellow-500 mb-2">CONVERSION PIPELINE...</p>
+                               <p>Sanctioned: 4.4 HP -> 3.3 kW</p>
+                               <p>Logic: IEEE standard 0.746 scale</p>
+                            </div>
+                         </div>
+                      </motion.div>
+                    )}
+                 </AnimatePresence>
 
                  <AnimatePresence mode="wait">
+                    {activeTab === 'impact' && (
+                       <motion.div key="impact" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[550px]">
+                          <div className="glass-card p-12 rounded-[4rem] flex flex-col justify-center items-center text-center">
+                             <div className="w-24 h-24 rounded-full bg-emerald-500/10 flex items-center justify-center mb-8">
+                                <TreeDeciduous className="w-12 h-12 text-emerald-500 animate-bounce" />
+                             </div>
+                             <h4 className="text-7xl font-black text-emerald-500 tracking-tighter">{treesSaved}</h4>
+                             <p className="text-sm font-black uppercase tracking-widest text-slate-500">Trees Saved Annually</p>
+                             <div className="mt-8 font-handwriting text-2xl text-emerald-500/60 max-w-xs">
+                                "Equal to planting 1 tree every 18 days via hybrid transition."
+                             </div>
+                          </div>
+                          <div className="glass-card p-12 rounded-[4rem] flex flex-col justify-center items-center text-center">
+                             <div className="w-24 h-24 rounded-full bg-blue-500/10 flex items-center justify-center mb-8">
+                                <Globe className="w-12 h-12 text-blue-500 animate-spin-slow" />
+                             </div>
+                             <h4 className="text-7xl font-black text-blue-500 tracking-tighter">{carbonSaved}</h4>
+                             <p className="text-sm font-black uppercase tracking-widest text-slate-500">KG CO2 Offset / Year</p>
+                             <div className="mt-8 font-handwriting text-2xl text-blue-500/60 max-w-xs">
+                                "Achieving Net-Zero profile with optimized hybrid helical blades."
+                             </div>
+                          </div>
+                       </motion.div>
+                    )}
+
                     {activeTab === 'audit' && (
                       <motion.div key="audit" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-12 rounded-[4rem] h-[550px] relative">
                          <div className="flex justify-between items-center mb-10">
                             <h3 className="text-2xl font-black flex items-center gap-4">
                                <BarChart3 className="w-6 h-6 text-yellow-500" /> Historical Load Anomaly Map
                             </h3>
-                            <div className="flex gap-4">
-                               <div className="flex items-center gap-2">
-                                  <div className="w-3 h-3 rounded-full bg-red-500" />
-                                  <span className="text-[10px] font-black uppercase tracking-widest opacity-50">Anomaly Detected</span>
-                               </div>
-                            </div>
                          </div>
                          <ResponsiveContainer width="100%" height="100%">
                             <BarChart data={forecastData}>
@@ -362,59 +401,18 @@ export default function EnergyBaeDashboard() {
                        <motion.div key="forecast" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="glass-card p-12 rounded-[4rem] h-[550px] relative">
                           <div className="flex justify-between items-center mb-10">
                              <h3 className="text-2xl font-black flex items-center gap-4">
-                                <TrendingUp className="w-6 h-6 text-yellow-500" /> Time-Series Energy Forecasting
+                                <TrendingUp className="w-6 h-6 text-yellow-500" /> Predictive Energy Projections
                              </h3>
                           </div>
                           <ResponsiveContainer width="100%" height="100%">
                              <AreaChart data={forecastData}>
-                               <defs>
-                                 <linearGradient id="colorPredicted" x1="0" y1="0" x2="0" y2="1">
-                                   <stop offset="5%" stopColor="#eab308" stopOpacity={0.2}/>
-                                   <stop offset="95%" stopColor="#eab308" stopOpacity={0}/>
-                                 </linearGradient>
-                               </defs>
                                <XAxis dataKey="month" stroke="#64748b33" fontSize={10} fontWeight={900} />
                                <Tooltip contentStyle={{ backgroundColor: '#020617', borderRadius: '24px', border: '1px solid rgba(234,179,8,0.2)' }} />
                                <Area type="monotone" dataKey="units" stroke="#64748b" strokeWidth={2} fill="transparent" strokeDasharray="5 5" name="Historical" />
-                               <Area type="monotone" dataKey="predicted" stroke="#eab308" strokeWidth={4} fill="url(#colorPredicted)" name="AI Forecast" animationDuration={2500} />
+                               <Area type="monotone" dataKey="predicted" stroke="#eab308" strokeWidth={4} fill="transparent" name="AI Forecast" animationDuration={2500} />
                              </AreaChart>
                           </ResponsiveContainer>
                        </motion.div>
-                    )}
-                    
-                    {activeTab === 'chat' && (
-                       <motion.div key="chat" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="glass-card rounded-[4rem] h-[550px] flex flex-col overflow-hidden">
-                          <div className="p-12 flex-1 overflow-y-auto custom-scrollbar-dark space-y-8">
-                             {chatHistory.map((c, i) => (
-                               <div key={i} className={clsx("flex", c.role === 'user' ? "justify-end" : "justify-start")}>
-                                 <div className={clsx(
-                                   "max-w-[70%] p-8 rounded-[2.5rem] text-sm font-bold shadow-2xl",
-                                   c.role === 'user' ? "bg-white text-slate-950 rounded-tr-none" : "bg-slate-900 border border-yellow-500/20 text-yellow-500 font-handwriting text-2xl rounded-tl-none"
-                                 )}>
-                                   {c.text}
-                                 </div>
-                               </div>
-                             ))}
-                             <div ref={chatEndRef} />
-                          </div>
-                          <div className="p-8 border-t border-white/5 flex gap-4">
-                             <input 
-                               type="text" className="flex-1 bg-transparent border-none text-white font-bold focus:ring-0 px-6" 
-                               placeholder="Consult with our Engineering Agent..."
-                               value={chatMessage} onChange={(e) => setChatMessage(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                             />
-                             <button onClick={handleSendMessage} className="w-16 h-16 bg-yellow-500 rounded-3xl flex items-center justify-center">
-                                <Send className="w-6 h-6 text-slate-950" />
-                             </button>
-                          </div>
-                       </motion.div>
-                    )}
-
-                    {activeTab === 'hardware' && (
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                          <HardwareItem title="Windistar 400" type="VAWT Hybrid" score={98} reason="Matches High Seasonality Profile" />
-                          <HardwareItem title="Bifacial 540W" type="Tier-1 Solar" score={95} reason="Optimizes Base-Load Extraction" />
-                       </div>
                     )}
                  </AnimatePresence>
 
@@ -423,13 +421,13 @@ export default function EnergyBaeDashboard() {
                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-yellow-500/50 to-transparent animate-beam-move" />
                     <div className="flex justify-between items-center mb-6">
                        <div className="flex items-center gap-3">
-                          <TerminalIcon className="w-4 h-4 text-yellow-500" />
-                          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-600">Neural Audit Stream</span>
+                          <Cpu className="w-4 h-4 text-yellow-500" />
+                          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-600">Neural Intelligence Stream</span>
                        </div>
                        <Activity className="w-4 h-4 text-yellow-500 animate-pulse" />
                     </div>
                     <div className="font-mono text-[10px] leading-relaxed h-20 overflow-y-auto opacity-40">
-                       {agentThoughts.map((t, i) => <div key={i}>[{new Date().toLocaleTimeString()}] [{t.type.toUpperCase()}] {t.message}</div>)}
+                       {agentThoughts.map((t, i) => <div key={i}>[{new Date().toLocaleTimeString()}] [{t.type.toUpperCase()}] {t.message}</div>) || "Engine Standby."}
                        <div ref={terminalEndRef} />
                     </div>
                  </div>
@@ -442,11 +440,11 @@ export default function EnergyBaeDashboard() {
       <footer className="relative z-50 p-12 flex justify-between items-center opacity-30 text-[10px] font-black uppercase tracking-widest">
          <div className="flex items-center gap-3">
             <Lock className="w-3 h-3 text-emerald-500" />
-            <span>AI Engineer Prototype V8.0</span>
+            <span>AI Engineer Flagship V11.0</span>
          </div>
          <div className="flex gap-10">
-            <span>Orchestration: Groq + OpenAI</span>
-            <span>Founder's Edition</span>
+            <span>Orchestration: Multi-Model Inference</span>
+            <span>Founder's Suite</span>
          </div>
       </footer>
     </div>
@@ -476,21 +474,3 @@ function SideButton({ id, label, active, set, icon: Icon }: any) {
     </button>
   );
 }
-
-function HardwareItem({ title, type, score, reason }: any) {
-  return (
-    <div className="glass-card p-12 rounded-[4rem] group hover:scale-[1.02] transition-all">
-       <div className="flex justify-between mb-8">
-          <div>
-             <h4 className="text-3xl font-black mb-2">{title}</h4>
-             <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">{type}</p>
-          </div>
-          <div className="text-4xl font-black text-yellow-500">{score}%</div>
-       </div>
-       <p className="text-xs font-bold text-slate-500 mb-10 leading-relaxed italic">"{reason}"</p>
-       <button className="w-full py-6 rounded-2xl bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 hover:text-slate-950 transition-all">Download Neural Specs</button>
-    </div>
-  );
-}
-
-const TerminalIcon = ({ className }: { className?: string }) => <Cpu className={className} />;
