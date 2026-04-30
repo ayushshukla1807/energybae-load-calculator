@@ -184,7 +184,7 @@ export default function EnergyBaeDashboard() {
           </div>
           <div>
             <h1 className="text-3xl font-black tracking-tighter uppercase leading-none">EnergyBae</h1>
-            <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mt-1">Enterprise Suite V13.0</p>
+            <p className="text-[10px] font-black text-yellow-500 uppercase tracking-[0.4em] mt-1">Enterprise Suite V16.0</p>
           </div>
         </div>
         <div className="flex items-center gap-10">
@@ -203,14 +203,14 @@ export default function EnergyBaeDashboard() {
               <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}>
                 <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-yellow-500/10 border border-yellow-500/20 mb-10">
                    <BrainCircuit className="w-4 h-4 text-yellow-500 animate-pulse" />
-                   <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500">Corporate Audit Intelligence</span>
+                   <span className="text-[10px] font-black uppercase tracking-widest text-yellow-500">Gemini-Powered Intelligence</span>
                 </div>
                 <h2 className="text-9xl font-black tracking-tighter leading-[0.8] mb-12">
                    Strategic <br/>
                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-600">Forecasting.</span>
                 </h2>
                 <p className="text-xl text-slate-500 font-medium max-w-xl leading-relaxed mb-12">
-                   Professional energy intelligence for the Maharashtra region. Multi-model failover inference with real-time ROI and ESG impact modeling.
+                   Professional energy intelligence for the Maharashtra region. RAG-grounded multi-modal inference with Gemini 1.5 Flash.
                 </p>
                 
                 {error && (
@@ -220,7 +220,7 @@ export default function EnergyBaeDashboard() {
                   </motion.div>
                 )}
 
-                <div className="glass-card p-1 rounded-[3rem] relative group">
+                <div className="glass-card p-1 rounded-[3rem] relative group mb-6">
                   <div className="p-10 border-2 border-dashed border-white/5 rounded-[2.8rem] group-hover:border-yellow-500/30 transition-all">
                     <input type="file" id="bill-upload" className="hidden" onChange={handleFileChange} />
                     <label htmlFor="bill-upload" className="cursor-pointer flex items-center gap-8">
@@ -235,20 +235,34 @@ export default function EnergyBaeDashboard() {
                   </div>
                 </div>
 
-                <div className="mt-8 flex gap-4">
+                <div className="glass-card p-4 rounded-[2rem] flex items-center gap-4 mb-8">
+                   <Lock className="w-5 h-5 text-slate-500 ml-2" />
+                   <input 
+                     type="password" 
+                     placeholder="Google Gemini API Key (or type DEMO)" 
+                     value={apiKey}
+                     onChange={(e) => setApiKey(e.target.value)}
+                     className="bg-transparent border-none outline-none w-full text-slate-300 font-mono text-sm placeholder:text-slate-600"
+                   />
+                </div>
+
+                <div className="flex gap-4">
                    <button 
                      onClick={handleExtract} 
                      disabled={isExtracting}
-                     className="flex-1 py-6 rounded-[2rem] bg-white text-slate-950 font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-white/10 disabled:opacity-50 flex items-center justify-center gap-4"
+                     className="flex-1 py-6 rounded-[2rem] bg-white text-slate-950 font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-white/10 disabled:opacity-50 flex items-center justify-center gap-4 relative overflow-hidden group"
                    >
-                     {isExtracting ? <Loader2 className="w-6 h-6 animate-spin" /> : <Network className="w-6 h-6" />}
-                     {isExtracting ? "EXECUTING AUDIT PIPELINE..." : "EXECUTE TECHNICAL AUDIT"}
+                     {isExtracting && <div className="absolute inset-0 bg-yellow-500/20 w-[200%] animate-scan" />}
+                     <div className="relative z-10 flex items-center gap-4">
+                        {isExtracting ? <Loader2 className="w-6 h-6 animate-spin text-yellow-600" /> : <Network className="w-6 h-6" />}
+                        {isExtracting ? "EXTRACTING VIA GEMINI..." : "EXECUTE TECHNICAL AUDIT"}
+                     </div>
                    </button>
                    <button 
-                     onClick={() => setIsDemoMode(true)}
+                     onClick={() => { setIsDemoMode(true); setApiKey("DEMO"); }}
                      className="px-10 rounded-[2rem] border border-white/10 hover:bg-white/5 transition-all font-black text-sm uppercase tracking-widest"
                    >
-                     Demo Mode
+                     Auto Demo
                    </button>
                 </div>
               </motion.div>
@@ -269,7 +283,7 @@ export default function EnergyBaeDashboard() {
                        <h2 className="text-5xl font-black tracking-tighter text-white mb-2">{extractedData.consumerName}</h2>
                        <div className="flex gap-4">
                           <Badge label={`LOAD: ${extractedData.sanctionedLoad}kW`} />
-                          <Badge label={`MODEL: ${extractedData.aiInsights?.modelUsed}`} />
+                          <Badge label={`MODEL: ${extractedData.aiInsights?.modelUsed || 'Gemini 1.5'}`} />
                           <Badge label={`ESG SCORE: 94/100`} />
                           <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black text-emerald-500 uppercase tracking-widest">
                              <CheckCircle2 className="w-3 h-3" />
@@ -325,12 +339,12 @@ export default function EnergyBaeDashboard() {
                          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-mono text-[10px] opacity-60">
                             <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
                                <p className="text-yellow-500 mb-2">SCANNING PAYLOAD...</p>
-                               <p>Detected: MSEDCL Format</p>
+                               <p>Engine: Gemini 1.5 Flash</p>
                                <p>Confidence: 0.99</p>
                             </div>
                             <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
                                <p className="text-yellow-500 mb-2">MAPPING BU CODE...</p>
-                               <p>Target: Billing Unit 4393</p>
+                               <p>Target: MSEDCL Format</p>
                             </div>
                             <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
                                <p className="text-yellow-500 mb-2">CONVERSION LOGIC...</p>
@@ -424,10 +438,10 @@ export default function EnergyBaeDashboard() {
       <footer className="relative z-50 p-12 flex justify-between items-center opacity-30 text-[10px] font-black uppercase tracking-widest">
          <div className="flex items-center gap-3">
             <Lock className="w-3 h-3 text-emerald-500" />
-            <span>AI Engineer Prototype V13.0</span>
+            <span>AI Engineer Prototype V16.0</span>
          </div>
          <div className="flex gap-10">
-            <span>Orchestration: Domain Inference</span>
+            <span>Orchestration: Gemini 1.5 Flash</span>
             <span>Technical Suite</span>
          </div>
       </footer>
