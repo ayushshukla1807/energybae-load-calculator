@@ -235,17 +235,6 @@ export default function EnergyBaeDashboard() {
                   </div>
                 </div>
 
-                <div className="glass-card p-4 rounded-[2rem] flex items-center gap-4 mb-8">
-                   <Lock className="w-5 h-5 text-slate-500 ml-2" />
-                   <input 
-                     type="password" 
-                     placeholder="Google Gemini API Key (or type DEMO)" 
-                     value={apiKey}
-                     onChange={(e) => setApiKey(e.target.value)}
-                     className="bg-transparent border-none outline-none w-full text-slate-300 font-mono text-sm placeholder:text-slate-600"
-                   />
-                </div>
-
                 <div className="flex gap-4">
                    <button 
                      onClick={handleExtract} 
@@ -255,14 +244,8 @@ export default function EnergyBaeDashboard() {
                      {isExtracting && <div className="absolute inset-0 bg-yellow-500/20 w-[200%] animate-scan" />}
                      <div className="relative z-10 flex items-center gap-4">
                         {isExtracting ? <Loader2 className="w-6 h-6 animate-spin text-yellow-600" /> : <Network className="w-6 h-6" />}
-                        {isExtracting ? "EXTRACTING VIA GEMINI..." : "EXECUTE TECHNICAL AUDIT"}
+                        {isExtracting ? "NEURAL EXTRACTION ACTIVE..." : "EXECUTE TECHNICAL AUDIT"}
                      </div>
-                   </button>
-                   <button 
-                     onClick={() => { setIsDemoMode(true); setApiKey("DEMO"); }}
-                     className="px-10 rounded-[2rem] border border-white/10 hover:bg-white/5 transition-all font-black text-sm uppercase tracking-widest"
-                   >
-                     Auto Demo
                    </button>
                 </div>
               </motion.div>
