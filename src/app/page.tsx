@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { 
   UploadCloud, Zap, Loader2, Download, AlertCircle, BarChart3, Settings2, IndianRupee,
   Activity, Lock, Globe, Cpu, Play, Volume2, Send, Bot, Rocket, Layers,
-  Fingerprint, Radio, MousePointer2, Pencil, Ruler, Calculator
+  Fingerprint, Radio, MousePointer2, Pencil, Ruler, Calculator, Box
 } from "lucide-react";
 import clsx from "clsx";
 import { 
