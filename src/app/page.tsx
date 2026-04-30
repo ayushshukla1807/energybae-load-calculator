@@ -342,7 +342,7 @@ export default function EnergyBaeDashboard() {
                             </div>
                             <div className="p-4 bg-black/20 rounded-2xl border border-white/5">
                                <p className="text-yellow-500 mb-2">CONVERSION PIPELINE...</p>
-                               <p>Sanctioned: 4.4 HP -> 3.3 kW</p>
+                               <p>Sanctioned: 4.4 HP to 3.3 kW</p>
                                <p>Logic: IEEE standard 0.746 scale</p>
                             </div>
                          </div>
