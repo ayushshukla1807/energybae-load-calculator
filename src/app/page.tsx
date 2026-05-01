@@ -63,6 +63,8 @@ export default function EnergyBaeDashboard() {
   const [chatHistory, setChatHistory] = useState<{role: 'user' | 'bot', text: string}[]>([]);
   const [roiInvestment, setRoiInvestment] = useState(150000);
   const [showAuditTrail, setShowAuditTrail] = useState(false);
+  const [isBatchMode, setIsBatchMode] = useState(false);
+  const [batchFiles, setBatchFiles] = useState<File[]>([]);
 
   const terminalEndRef = useRef<HTMLDivElement>(null);
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -232,6 +234,21 @@ export default function EnergyBaeDashboard() {
                    Professional energy intelligence for the Maharashtra region. RAG-grounded multi-modal inference with Gemini 1.5 Flash.
                 </p>
                 
+                <div className="flex gap-4 mb-10">
+                   <button 
+                     onClick={() => setIsBatchMode(false)}
+                     className={clsx("px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all", !isBatchMode ? "bg-indigo-600 text-white shadow-lg" : "text-muted-foreground hover:bg-card")}
+                   >
+                     Single Audit
+                   </button>
+                   <button 
+                     onClick={() => setIsBatchMode(true)}
+                     className={clsx("px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all", isBatchMode ? "bg-indigo-600 text-white shadow-lg" : "text-muted-foreground hover:bg-card")}
+                   >
+                     Batch Engine
+                   </button>
+                </div>
+
                 {error && (
                   <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-6 bg-red-500/10 border border-red-500/20 rounded-[2rem] flex items-center gap-4 text-red-400 font-bold">
                     <ShieldAlert className="w-6 h-6" />
@@ -241,14 +258,32 @@ export default function EnergyBaeDashboard() {
 
                 <div className="enterprise-card p-1 rounded-[3rem] relative group mb-6">
                   <div className="p-10 border-2 border-dashed border-border rounded-[2.8rem] group-hover:border-indigo-500/20 transition-all">
-                    <input type="file" id="bill-upload" className="hidden" onChange={handleFileChange} />
+                    <input 
+                      type="file" 
+                      id="bill-upload" 
+                      className="hidden" 
+                      multiple={isBatchMode}
+                      onChange={(e) => {
+                        if (isBatchMode) {
+                          setBatchFiles(Array.from(e.target.files || []));
+                        } else {
+                          handleFileChange(e);
+                        }
+                      }} 
+                    />
                     <label htmlFor="bill-upload" className="cursor-pointer flex items-center gap-8">
                        <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30">
                           <UploadCloud className="w-10 h-10 text-background" />
                        </div>
                        <div>
-                          <p className="text-2xl font-black">{file ? file.name : "Secure Document Upload"}</p>
-                          <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">MSEDCL Audit Interface Active</p>
+                          <p className="text-2xl font-black">
+                            {isBatchMode 
+                              ? (batchFiles.length > 0 ? `${batchFiles.length} Documents Selected` : "Upload Batch Directory")
+                              : (file ? file.name : "Secure Document Upload")}
+                          </p>
+                          <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                            {isBatchMode ? "High-Volume Parallel Processing" : "MSEDCL Audit Interface Active"}
+                          </p>
                        </div>
                     </label>
                   </div>
@@ -436,7 +471,14 @@ export default function EnergyBaeDashboard() {
                                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">System Parameters</p>
                                    <div className="space-y-3">
                                       <div className="flex flex-col gap-1">
-                                         <label className="text-[10px] font-bold text-slate-400 ml-2">Sanctioned Load (kW)</label>
+                                         <div className="flex justify-between items-center px-2">
+                                            <label className="text-[10px] font-bold text-slate-400">Sanctioned Load (kW)</label>
+                                            {editableData.sanctionedLoad > 0 && (
+                                               <span className="text-[8px] font-black text-indigo-500 uppercase tracking-widest flex items-center gap-1">
+                                                  <Info className="w-2 h-2" /> HP Conversion Active
+                                               </span>
+                                            )}
+                                         </div>
                                          <input 
                                             type="text" value={editableData.sanctionedLoad} 
                                             onChange={(e) => setEditableData({...editableData, sanctionedLoad: e.target.value})}

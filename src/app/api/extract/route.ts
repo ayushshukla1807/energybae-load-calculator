@@ -15,62 +15,67 @@ export async function POST(req: NextRequest) {
       console.warn("No API Keys found in ENV. Falling back to built-in Neural Extraction Simulation.");
     }
 
-    // --- Intelligence Layer: Gemini 1.5 Flash (Primary for RAG/Reasoning) ---
+    // --- Intelligence Layer: Multi-Model Cascade (Gemini 2.0 -> 1.5) ---
     if (apiKey && apiKey !== "DEMO") {
-      try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+      const genAI = new GoogleGenerativeAI(apiKey);
+      const modelsToTry = ["gemini-2.0-flash", "gemini-1.5-flash"];
+      
+      for (const modelName of modelsToTry) {
+        try {
+          const model = genAI.getGenerativeModel({ model: modelName });
 
-        const prompt = `
-          ACT AS AN ELITE ENERGY AUDIT AGENT FOR MSEDCL (MAHARASHTRA STATE ELECTRICITY DISTRIBUTION).
-          YOUR TASK IS TO EXTRACT HIGH-PRECISION DATA FROM THE ATTACHED BILL TEXT/IMAGE.
+          const prompt = `
+            ACT AS AN ELITE ENERGY AUDIT AGENT FOR MSEDCL (MAHARASHTRA STATE ELECTRICITY DISTRIBUTION).
+            YOUR TASK IS TO EXTRACT HIGH-PRECISION DATA FROM THE ATTACHED BILL TEXT/IMAGE.
 
-          ### DOMAIN RULES (RAG INTELLIGENCE):
-          1. CONSUMER NO: Look for 12-digit numeric strings near labels like "Consumer No" or "Grahak Kr."
-          2. BILLING UNIT (BU): Usually a 4-digit code (e.g., 4393, 4602).
-          3. SANCTIONED LOAD: Look for values in HP or kW. If in HP, convert to kW (HP * 0.746).
-          4. BILLING HISTORY: Extract the last 12 months of consumption (Units/kWh). 
-          5. VARIANCE WARNING: DO NOT provide static or generic values. Every bill is unique. If a field is missing, mark as "N/A" rather than guessing.
+            ### DOMAIN RULES (RAG INTELLIGENCE):
+            1. CONSUMER NO: Look for 12-digit numeric strings near labels like "Consumer No" or "Grahak Kr."
+            2. BILLING UNIT (BU): Usually a 4-digit code (e.g., 4393, 4602).
+            3. SANCTIONED LOAD: Look for values in HP or kW. 
+               - CRITICAL: If the value is in HP (Horse Power), convert to kW (HP * 0.746). 
+               - If the bill says "5 HP", output "3.73".
+            4. BILLING HISTORY: Extract the last 12 months of consumption (Units/kWh). 
+            5. VARIANCE WARNING: If a field is missing, mark as "N/A" rather than guessing.
 
-          RETURN STRICT JSON ONLY:
-          {
-            "consumerName": "STRING",
-            "consumerNo": "STRING",
-            "billingUnit": "STRING",
-            "fixedCharges": NUMBER,
-            "sanctionedLoad": NUMBER,
-            "connectionType": "STRING",
-            "billAmount": NUMBER,
-            "billingHistory": [{"month": "STRING", "units": NUMBER}],
-            "aiInsights": {
-              "loadEfficiency": "High/Medium/Low",
-              "seasonalityIndex": "e.g. 1.2x",
-              "confidence": 0.0-1.0,
-              "modelUsed": "Gemini-1.5-Flash"
+            RETURN STRICT JSON ONLY:
+            {
+              "consumerName": "STRING",
+              "consumerNo": "STRING",
+              "billingUnit": "STRING",
+              "fixedCharges": NUMBER,
+              "sanctionedLoad": NUMBER,
+              "connectionType": "STRING",
+              "billAmount": NUMBER,
+              "billingHistory": [{"month": "STRING", "units": NUMBER}],
+              "aiInsights": {
+                "loadEfficiency": "High/Medium/Low",
+                "seasonalityIndex": "e.g. 1.2x",
+                "confidence": 0.0-1.0,
+                "modelUsed": "${modelName}"
+              }
             }
+          `;
+
+          let filePart: any = null;
+          if (file) {
+             const buffer = Buffer.from(await file.arrayBuffer());
+             filePart = {
+               inlineData: {
+                 data: buffer.toString('base64'),
+                 mimeType: file.type || "application/pdf"
+               }
+             };
           }
-        `;
 
-        // Convert file to base64 for Gemini multimodal input
-        let filePart: any = null;
-        if (file) {
-           const buffer = Buffer.from(await file.arrayBuffer());
-           filePart = {
-             inlineData: {
-               data: buffer.toString('base64'),
-               mimeType: file.type || "application/pdf"
-             }
-           };
+          const promptPayload = filePart ? [prompt, filePart] : [prompt, "No file provided. Return empty schema."];
+          const result = await model.generateContent(promptPayload as any);
+          const response = await result.response;
+          const text = response.text();
+          const jsonMatch = text.match(/\{[\s\S]*\}/);
+          if (jsonMatch) return NextResponse.json(JSON.parse(jsonMatch[0]));
+        } catch (err) {
+          console.error(`${modelName} Failure, cascading...`, err);
         }
-
-        const promptPayload = filePart ? [prompt, filePart] : [prompt, "No file provided. Return empty schema."];
-        const result = await model.generateContent(promptPayload as any);
-        const response = await result.response;
-        const text = response.text();
-        const jsonMatch = text.match(/\{[\s\S]*\}/);
-        if (jsonMatch) return NextResponse.json(JSON.parse(jsonMatch[0]));
-      } catch (err) {
-        console.error("Gemini Failure, falling back to inbuilt models:", err);
       }
     }
 
