@@ -453,7 +453,7 @@ export default function EnergyBaeDashboard() {
                                          <input 
                                             type="text" value={editableData.consumerName} 
                                             onChange={(e) => setEditableData({...editableData, consumerName: e.target.value})}
-                                            className="bg-background border border-border rounded-xl px-4 py-3 text-sm font-bold focus:border-indigo-600 outline-none transition-colors" 
+                                            className="glass-input" 
                                          />
                                       </div>
                                       <div className="flex flex-col gap-1">
@@ -461,7 +461,7 @@ export default function EnergyBaeDashboard() {
                                          <input 
                                             type="text" value={editableData.consumerNo} 
                                             onChange={(e) => setEditableData({...editableData, consumerNo: e.target.value})}
-                                            className="bg-background border border-border rounded-xl px-4 py-3 text-sm font-bold focus:border-indigo-600 outline-none transition-colors" 
+                                            className="glass-input" 
                                          />
                                       </div>
                                    </div>
@@ -482,7 +482,7 @@ export default function EnergyBaeDashboard() {
                                          <input 
                                             type="text" value={editableData.sanctionedLoad} 
                                             onChange={(e) => setEditableData({...editableData, sanctionedLoad: e.target.value})}
-                                            className="bg-background border border-border rounded-xl px-4 py-3 text-sm font-bold focus:border-indigo-600 outline-none transition-colors" 
+                                            className="glass-input" 
                                          />
                                       </div>
                                       <div className="flex flex-col gap-1">
@@ -490,7 +490,7 @@ export default function EnergyBaeDashboard() {
                                          <input 
                                             type="text" value={editableData.connectionType} 
                                             onChange={(e) => setEditableData({...editableData, connectionType: e.target.value})}
-                                            className="bg-background border border-border rounded-xl px-4 py-3 text-sm font-bold focus:border-indigo-600 outline-none transition-colors" 
+                                            className="glass-input" 
                                          />
                                       </div>
                                    </div>
@@ -516,7 +516,7 @@ export default function EnergyBaeDashboard() {
                                                newHistory[idx].units = e.target.value;
                                                setEditableData({...editableData, billingHistory: newHistory});
                                             }}
-                                            className="bg-transparent text-sm font-bold outline-none focus:text-indigo-600" 
+                                            className="bg-transparent text-sm font-bold outline-none focus:text-indigo-400" 
                                          />
                                       </motion.div>
                                    ))}
@@ -703,7 +703,7 @@ function Badge({ label }: { label: string }) {
 
 function SideButton({ id, label, active, set, icon: Icon }: any) {
   return (
-    <button onClick={() => set(id)} className={clsx("w-full flex items-center gap-4 px-8 py-6 rounded-[2rem] transition-all duration-500", active === id ? "bg-white text-background shadow-2xl" : "hover:bg-card text-muted-foreground")}>
+    <button onClick={() => set(id)} className={clsx("w-full flex items-center gap-4 px-8 py-6 rounded-[2rem] transition-all duration-500", active === id ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_30px_rgba(79,70,229,0.3)]" : "hover:bg-white/5 text-muted-foreground")}>
        <Icon className="w-5 h-5" />
        <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
     </button>
