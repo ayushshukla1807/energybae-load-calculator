@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { 
-  UploadCloud, Zap, Loader2, Download, AlertCircle, BarChart3, Settings2, IndianRupee,
+  UploadCloud, Zap, Loader2, Download, AlertCircle, BarChart3, Settings2, IndianRupee, ShieldCheck, RefreshCcw, FileSpreadsheet,
   Activity, Lock, Globe, Cpu, Send, Bot, Layers,
   Fingerprint, Radio, MousePointer2, Pencil, Ruler, Calculator, Box, TrendingUp,
   ShieldAlert, Sparkles, BrainCircuit, Network, Microscope, Info, CheckCircle2,
@@ -52,11 +52,12 @@ export default function EnergyBaeDashboard() {
   const [file, setFile] = useState<File | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
   const [extractedData, setExtractedData] = useState<ExtractedData | null>(null);
+  const [editableData, setEditableData] = useState<any>(null);
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [apiKey, setApiKey] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [agentThoughts, setAgentThoughts] = useState<AgentThought[]>([]);
-  const [activeTab, setActiveTab] = useState<'audit' | 'forecast' | 'vision' | 'chat' | 'impact'>('audit');
+  const [activeTab, setActiveTab] = useState<'audit' | 'forecast' | 'verify' | 'chat' | 'impact'>('verify');
   const [selectedModel, setSelectedModel] = useState<'gemini' | 'llama' | 'claude'>('gemini');
   const [chatMessage, setChatMessage] = useState("");
   const [chatHistory, setChatHistory] = useState<{role: 'user' | 'bot', text: string}[]>([]);
@@ -138,24 +139,25 @@ export default function EnergyBaeDashboard() {
       
       if (!res.ok) throw new Error(data.error || "Technical Link Failure.");
 
-      
-
       setExtractedData(data);
-      setChatHistory([{ role: 'bot', text: "Technical Audit Complete. Impact analysis and forecasting modules active." }]);
+      setEditableData(JSON.parse(JSON.stringify(data)));
+      setIsExtracting(false);
+      setShowAuditTrail(true);
+      setActiveTab('verify');
+      setChatHistory([{ role: 'bot', text: "Technical Audit Complete. The Verification Workspace is now active. Please review the extracted metrics before finalizing the report." }]);
     } catch (err: any) {
       setError(err.message || "A system error occurred during the technical audit.");
-    } finally {
       setIsExtracting(false);
     }
   };
 
   const generateExcel = async () => {
-    if (!extractedData) return;
+    if (!editableData) return;
     try {
       const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(extractedData),
+        body: JSON.stringify(editableData),
       });
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
@@ -338,7 +340,7 @@ export default function EnergyBaeDashboard() {
                     <SideButton id="audit" label="LOAD SCHEMATIC" active={activeTab} set={setActiveTab} icon={Layers} />
                     <SideButton id="forecast" label="PREDICTIVE AI" active={activeTab} set={setActiveTab} icon={TrendingUp} />
                     <SideButton id="impact" label="ESG IMPACT" active={activeTab} set={setActiveTab} icon={Leaf} />
-                    <SideButton id="vision" label="VISION ANALYSIS" active={activeTab} set={setActiveTab} icon={Eye} />
+                    <SideButton id="verify" label="VERIFY DATA" active={activeTab} set={setActiveTab} icon={ShieldCheck} />
                     <SideButton id="chat" label="ENGINEER GPT" active={activeTab} set={setActiveTab} icon={Bot} />
                  </div>
                  
@@ -392,31 +394,114 @@ export default function EnergyBaeDashboard() {
                  </AnimatePresence>
 
                  <AnimatePresence mode="wait">
-                    {activeTab === 'vision' && (
-                       <motion.div key="vision" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-12 rounded-[4rem] h-[550px] relative overflow-hidden flex items-center justify-center">
-                          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-10 mix-blend-luminosity" />
-                          
-                          <div className="relative z-10 w-full max-w-2xl bg-background/80 p-8 rounded-[2rem] border border-border backdrop-blur-md">
-                             <h3 className="text-xl font-black flex items-center gap-4 mb-6 text-yellow-500">
-                                <ScanFace className="w-6 h-6" /> Document Extraction Analysis
+                    {activeTab === 'verify' && editableData && (
+                       <motion.div key="verify" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-10 rounded-[3rem] h-[580px] relative overflow-hidden flex flex-col">
+                          <div className="flex items-center justify-between mb-8">
+                             <h3 className="text-xl font-black flex items-center gap-4 text-yellow-500">
+                                <ShieldCheck className="w-6 h-6" /> Audit Verification Workspace
                              </h3>
-                             <div className="grid grid-cols-2 gap-4">
-                                <div className="p-4 border border-emerald-500/30 bg-emerald-500/5 rounded-xl">
-                                   <p className="text-[10px] font-mono text-emerald-500 mb-1">BOUNDING_BOX_01</p>
-                                   <p className="font-bold">Consumer No: {extractedData.consumerNo}</p>
+                             <button 
+                                onClick={() => setEditableData(JSON.parse(JSON.stringify(extractedData)))}
+                                className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-yellow-500 flex items-center gap-2 transition-colors"
+                             >
+                                <RefreshCcw className="w-3 h-3" /> Reset to AI Extraction
+                             </button>
+                          </div>
+
+                          <div className="flex-1 overflow-y-auto custom-scrollbar-dark pr-4 space-y-8">
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div className="space-y-4">
+                                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Consumer Identity</p>
+                                   <div className="space-y-3">
+                                      <div className="flex flex-col gap-1">
+                                         <label className="text-[10px] font-bold text-slate-400 ml-2">Consumer Name</label>
+                                         <input 
+                                            type="text" value={editableData.consumerName} 
+                                            onChange={(e) => setEditableData({...editableData, consumerName: e.target.value})}
+                                            className="bg-background border border-border rounded-xl px-4 py-3 text-sm font-bold focus:border-yellow-500 outline-none transition-colors" 
+                                         />
+                                      </div>
+                                      <div className="flex flex-col gap-1">
+                                         <label className="text-[10px] font-bold text-slate-400 ml-2">Consumer Number</label>
+                                         <input 
+                                            type="text" value={editableData.consumerNo} 
+                                            onChange={(e) => setEditableData({...editableData, consumerNo: e.target.value})}
+                                            className="bg-background border border-border rounded-xl px-4 py-3 text-sm font-bold focus:border-yellow-500 outline-none transition-colors" 
+                                         />
+                                      </div>
+                                   </div>
                                 </div>
-                                <div className="p-4 border border-blue-500/30 bg-blue-500/5 rounded-xl">
-                                   <p className="text-[10px] font-mono text-blue-500 mb-1">ENTROPY_SCORE</p>
-                                   <p className="font-bold">0.9984 (High Clarity)</p>
-                                </div>
-                                <div className="p-4 border border-purple-500/30 bg-purple-500/5 rounded-xl col-span-2">
-                                   <p className="text-[10px] font-mono text-purple-500 mb-1">TABLE_EXTRACTION_MATRIX</p>
-                                   <div className="h-10 w-full bg-gradient-to-r from-purple-500/20 to-transparent rounded-lg flex items-center px-4 mt-2">
-                                      <div className="w-2 h-2 bg-purple-500 rounded-full animate-ping" />
-                                      <span className="ml-4 font-mono text-xs opacity-70">Parsing 12 months... OK.</span>
+
+                                <div className="space-y-4">
+                                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">System Parameters</p>
+                                   <div className="space-y-3">
+                                      <div className="flex flex-col gap-1">
+                                         <label className="text-[10px] font-bold text-slate-400 ml-2">Sanctioned Load (kW)</label>
+                                         <input 
+                                            type="text" value={editableData.sanctionedLoad} 
+                                            onChange={(e) => setEditableData({...editableData, sanctionedLoad: e.target.value})}
+                                            className="bg-background border border-border rounded-xl px-4 py-3 text-sm font-bold focus:border-yellow-500 outline-none transition-colors" 
+                                         />
+                                      </div>
+                                      <div className="flex flex-col gap-1">
+                                         <label className="text-[10px] font-bold text-slate-400 ml-2">Connection Type</label>
+                                         <input 
+                                            type="text" value={editableData.connectionType} 
+                                            onChange={(e) => setEditableData({...editableData, connectionType: e.target.value})}
+                                            className="bg-background border border-border rounded-xl px-4 py-3 text-sm font-bold focus:border-yellow-500 outline-none transition-colors" 
+                                         />
+                                      </div>
                                    </div>
                                 </div>
                              </div>
+
+                             <div className="space-y-4">
+                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">12-Month Consumption History (Units)</p>
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                                   {editableData.billingHistory?.map((item: any, idx: number) => (
+                                      <div key={idx} className="bg-background border border-border rounded-xl p-3 flex flex-col gap-1">
+                                         <span className="text-[9px] font-black text-slate-500 uppercase">{item.month}</span>
+                                         <input 
+                                            type="number" value={item.units} 
+                                            onChange={(e) => {
+                                               const newHistory = [...editableData.billingHistory];
+                                               newHistory[idx].units = e.target.value;
+                                               setEditableData({...editableData, billingHistory: newHistory});
+                                            }}
+                                            className="bg-transparent text-sm font-bold outline-none focus:text-yellow-500" 
+                                         />
+                                      </div>
+                                   ))}
+                                </div>
+                             </div>
+                          </div>
+                          
+                          <div className="mt-8 pt-6 border-t border-border flex justify-between items-center">
+                             <div className="flex items-center gap-4">
+                                <div className="flex -space-x-2">
+                                   <div className="w-8 h-8 rounded-full border-2 border-background bg-emerald-500 flex items-center justify-center text-[10px] font-black text-white">AI</div>
+                                   <div className="w-8 h-8 rounded-full border-2 border-background bg-slate-700 flex items-center justify-center text-[10px] font-black text-white">HQ</div>
+                                </div>
+                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Awaiting Verification Signature</p>
+                             </div>
+                             <button 
+                                onClick={generateExcel}
+                                className="bg-yellow-500 hover:bg-yellow-400 text-background dark:text-black font-black uppercase tracking-widest text-xs px-8 py-4 rounded-2xl shadow-xl shadow-yellow-500/20 transition-all flex items-center gap-3"
+                             >
+                                <FileSpreadsheet className="w-4 h-4" /> Finalize Official Report
+                             </button>
+                          </div>
+                       </motion.div>
+                    )}
+
+                    {activeTab === 'verify' && !extractedData && (
+                       <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="glass-card p-12 rounded-[4rem] h-[580px] flex flex-col items-center justify-center text-center space-y-6">
+                          <div className="w-24 h-24 bg-card border border-border rounded-[2rem] flex items-center justify-center shadow-inner">
+                             <ScanFace className="w-12 h-12 text-slate-300 dark:text-slate-700" />
+                          </div>
+                          <div>
+                             <h3 className="text-xl font-black mb-2 text-foreground">Audit Workspace Empty</h3>
+                             <p className="text-sm text-muted-foreground max-w-xs mx-auto">Upload an electricity bill to initialize the AI extraction and verification sequence.</p>
                           </div>
                        </motion.div>
                     )}
