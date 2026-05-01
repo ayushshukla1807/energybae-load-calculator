@@ -364,8 +364,8 @@ export default function EnergyBaeDashboard() {
                        <Search className="w-8 h-8 text-muted-foreground group-hover:text-indigo-600" />
                        <div className="absolute top-[-40px] whitespace-nowrap opacity-0 group-hover:opacity-100 text-[9px] font-black uppercase tracking-widest text-indigo-600 transition-opacity">Technical Log</div>
                     </button>
-                    <button onClick={generateExcel} className="h-20 px-12 rounded-[2rem] bg-white text-background font-black text-lg shadow-2xl hover:scale-105 transition-all">
-                       EXPORT TECHNICAL AUDIT
+                    <button onClick={generateExcel} className="h-20 px-12 rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white font-black text-lg shadow-[0_0_40px_rgba(79,70,229,0.4)] hover:scale-[1.05] transition-all">
+                       GENERATE FINAL REPORT
                     </button>
                  </div>
               </motion.div>
