@@ -184,7 +184,7 @@ export default function EnergyBaeDashboard() {
   const treesSaved = (Number(carbonSaved) / 20).toFixed(0);
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-sans selection:bg-indigo-500/20 overflow-x-hidden relative">
+    <div className="min-h-screen bg-background text-foreground font-body tracking-tight selection:bg-indigo-500/20 overflow-x-hidden relative">
       <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none">
         <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
           <defs>
@@ -212,7 +212,7 @@ export default function EnergyBaeDashboard() {
           <NavInfo label="Model Status" value="Online / 14ms" />
           <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-card relative group cursor-pointer">
              <Bot className="w-6 h-6 text-muted-foreground group-hover:text-indigo-600 transition-colors" />
-             <div className="absolute inset-0 bg-indigo-500/5 blur-xl opacity-0 group-hover:opacity-100 rounded-full transition-opacity" />
+             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 blur-xl opacity-0 group-hover:opacity-100 rounded-full transition-opacity" />
           </div>
         </div>
       </nav>
@@ -222,7 +222,7 @@ export default function EnergyBaeDashboard() {
           {!extractedData ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center min-h-[70vh]">
               <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}>
-                <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-indigo-500/5 border border-indigo-500/10 mb-10">
+                <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-gradient-to-br from-indigo-500/10 to-purple-500/5 border border-indigo-500/10 mb-10">
                    <BrainCircuit className="w-4 h-4 text-indigo-600 animate-pulse" />
                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Gemini-Powered Intelligence</span>
                 </div>
@@ -237,13 +237,13 @@ export default function EnergyBaeDashboard() {
                 <div className="flex gap-4 mb-10">
                    <button 
                      onClick={() => setIsBatchMode(false)}
-                     className={clsx("px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all", !isBatchMode ? "bg-indigo-600 text-white shadow-lg" : "text-muted-foreground hover:bg-card")}
+                     className={clsx("px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all", !isBatchMode ? "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg" : "text-muted-foreground hover:bg-card")}
                    >
                      Single Audit
                    </button>
                    <button 
                      onClick={() => setIsBatchMode(true)}
-                     className={clsx("px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all", isBatchMode ? "bg-indigo-600 text-white shadow-lg" : "text-muted-foreground hover:bg-card")}
+                     className={clsx("px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all", isBatchMode ? "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg" : "text-muted-foreground hover:bg-card")}
                    >
                      Batch Engine
                    </button>
@@ -256,7 +256,7 @@ export default function EnergyBaeDashboard() {
                   </motion.div>
                 )}
 
-                <div className="enterprise-card p-1 rounded-[3rem] relative group mb-6">
+                <div className="luxury-card p-1 rounded-[3rem] relative group mb-6">
                   <div className="p-10 border-2 border-dashed border-border rounded-[2.8rem] group-hover:border-indigo-500/20 transition-all">
                     <input 
                       type="file" 
@@ -272,7 +272,7 @@ export default function EnergyBaeDashboard() {
                       }} 
                     />
                     <label htmlFor="bill-upload" className="cursor-pointer flex items-center gap-8">
-                       <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30">
+                       <div className="w-20 h-20 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30">
                           <UploadCloud className="w-10 h-10 text-background" />
                        </div>
                        <div>
@@ -281,7 +281,7 @@ export default function EnergyBaeDashboard() {
                               ? (batchFiles.length > 0 ? `${batchFiles.length} Documents Selected` : "Upload Batch Directory")
                               : (file ? file.name : "Secure Document Upload")}
                           </p>
-                          <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">
+                          <p className="text-[10px] font-black text-indigo-400 font-bold uppercase tracking-[0.2em] tracking-widest">
                             {isBatchMode ? "High-Volume Parallel Processing" : "MSEDCL Audit Interface Active"}
                           </p>
                        </div>
@@ -293,7 +293,7 @@ export default function EnergyBaeDashboard() {
                    <button 
                      onClick={handleExtract} 
                      disabled={isExtracting}
-                     className="flex-1 py-6 rounded-[2rem] bg-white text-background font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-white/10 disabled:opacity-50 flex items-center justify-center gap-4 relative overflow-hidden group"
+                     className="flex-1 py-6 rounded-[2rem] bg-gradient-to-r from-white to-slate-100 text-black shadow-2xl gold-glow font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-white/10 disabled:opacity-50 flex items-center justify-center gap-4 relative overflow-hidden group"
                    >
                      {isExtracting && <div className="absolute inset-0 bg-indigo-500/10 w-[200%] animate-scan" />}
                      <div className="relative z-10 flex items-center gap-4">
@@ -305,7 +305,7 @@ export default function EnergyBaeDashboard() {
               </motion.div>
 
               <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="relative mt-10 lg:mt-0">
-                <div className="absolute inset-0 bg-indigo-500/5 blur-[120px] rounded-full" />
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 blur-[120px] rounded-full" />
                 <div className="relative rounded-[3rem] overflow-hidden border-2 border-border shadow-xl dark:shadow-2xl shadow-indigo-500/5 dark:shadow-indigo-500/10 group">
                    <Image src="/solar-array.png" alt="Solar Analytics Array" width={800} height={800} className="relative z-10 w-full h-[600px] object-cover transition-transform duration-1000 group-hover:scale-105" />
                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-20" />
@@ -327,7 +327,7 @@ export default function EnergyBaeDashboard() {
                       {isExtracting ? (
                          <div className="space-y-2">
                            <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                              <div className="h-full bg-indigo-600 w-1/3 animate-[pulse_2s_ease-in-out_infinite]" />
+                              <div className="h-full bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 w-1/3 animate-[pulse_2s_ease-in-out_infinite]" />
                            </div>
                            <p className="text-[9px] font-mono text-muted-foreground">Extracting electricity bill fields...</p>
                          </div>
@@ -340,9 +340,9 @@ export default function EnergyBaeDashboard() {
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="lg:col-span-12 enterprise-card p-12 rounded-[4rem] flex flex-col md:flex-row justify-between items-center border-2 border-indigo-500/5 relative overflow-hidden group">
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="lg:col-span-12 luxury-card p-12 rounded-[4rem] flex flex-col md:flex-row justify-between items-center border-2 border-indigo-500/5 relative overflow-hidden group">
                  <div className="flex items-center gap-8 relative z-10">
-                    <div className="w-24 h-24 rounded-[2rem] bg-indigo-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20">
+                    <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20">
                        <FileCheck2 className="w-10 h-10 text-background" />
                     </div>
                     <div>
@@ -371,7 +371,7 @@ export default function EnergyBaeDashboard() {
               </motion.div>
 
               <div className="lg:col-span-3 space-y-6">
-                 <div className="enterprise-card p-4 rounded-[3rem] space-y-2">
+                 <div className="luxury-card p-4 rounded-[3rem] space-y-2">
                     <SideButton id="audit" label="LOAD SCHEMATIC" active={activeTab} set={setActiveTab} icon={Layers} />
                     <SideButton id="forecast" label="PREDICTIVE AI" active={activeTab} set={setActiveTab} icon={TrendingUp} />
                     <SideButton id="impact" label="ESG IMPACT" active={activeTab} set={setActiveTab} icon={Leaf} />
@@ -379,7 +379,7 @@ export default function EnergyBaeDashboard() {
                     <SideButton id="chat" label="ENGINEER GPT" active={activeTab} set={setActiveTab} icon={Bot} />
                  </div>
                  
-                 <div className="enterprise-card p-10 rounded-[3rem] bg-gradient-to-br from-indigo-500/5 to-transparent">
+                 <div className="luxury-card p-10 rounded-[3rem] bg-gradient-to-br from-indigo-500/5 to-transparent">
                     <div className="flex justify-between mb-8 items-center">
                        <IndianRupee className="w-6 h-6 text-indigo-600" />
                        <span className="font-handwriting text-indigo-600/60 text-lg">Financial Modeling</span>
@@ -390,14 +390,14 @@ export default function EnergyBaeDashboard() {
                       className="w-full h-1 bg-indigo-500/10 rounded-full appearance-none cursor-pointer accent-indigo-600 mb-6"
                     />
                     <p className="text-2xl font-black">₹{(roiInvestment/100000).toFixed(1)}L</p>
-                    <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest">Investment Vector</p>
+                    <p className="text-[10px] font-black text-indigo-400 font-bold uppercase tracking-[0.2em] tracking-widest">Investment Vector</p>
                  </div>
               </div>
 
               <div className="lg:col-span-9 space-y-8">
                  <AnimatePresence>
                     {showAuditTrail && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="enterprise-card p-10 rounded-[3rem] bg-slate-500/5 border border-indigo-500/10 overflow-hidden">
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="luxury-card p-10 rounded-[3rem] bg-slate-500/5 border border-indigo-500/10 overflow-hidden">
                          <div className="flex items-center gap-4 mb-6">
                             <History className="w-5 h-5 text-indigo-600" />
                             <h3 className="text-sm font-black uppercase tracking-widest">Processing Pipeline</h3>
@@ -418,7 +418,7 @@ export default function EnergyBaeDashboard() {
                                <p>Scaling HP to kW</p>
                                <p>Factor: IEEE 0.746</p>
                             </div>
-                            <div className="p-4 bg-indigo-500/5 rounded-2xl border border-indigo-500/10">
+                            <div className="p-4 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 rounded-2xl border border-indigo-500/10">
                                <p className="text-indigo-600 mb-2 font-bold">4. EXCEL GEN</p>
                                <p>Model: Template Mapper</p>
                                <p>Status: Active</p>
@@ -430,7 +430,7 @@ export default function EnergyBaeDashboard() {
 
                  <AnimatePresence mode="wait">
                     {activeTab === 'verify' && editableData && (
-                       <motion.div key="verify" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="enterprise-card p-10 rounded-[3rem] h-[580px] relative overflow-hidden flex flex-col">
+                       <motion.div key="verify" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="luxury-card p-10 rounded-[3rem] h-[580px] relative overflow-hidden flex flex-col">
                           <div className="flex items-center justify-between mb-8">
                              <h3 className="text-xl font-black flex items-center gap-4 text-indigo-600">
                                 <ShieldCheck className="w-6 h-6" /> Audit Verification Workspace
@@ -501,7 +501,13 @@ export default function EnergyBaeDashboard() {
                                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">12-Month Consumption History (Units)</p>
                                 <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                                    {editableData.billingHistory?.map((item: any, idx: number) => (
-                                      <div key={idx} className="bg-background border border-border rounded-xl p-3 flex flex-col gap-1">
+                                      <motion.div 
+                                        key={idx}
+                                        initial={{ opacity: 0, y: 10 }} 
+                                        animate={{ opacity: 1, y: 0 }} 
+                                        transition={{ delay: idx * 0.05 }}
+                                        className="bg-background border border-border rounded-xl p-3 flex flex-col gap-1"
+                                      >
                                          <span className="text-[9px] font-black text-slate-500 uppercase">{item.month}</span>
                                          <input 
                                             type="number" value={item.units} 
@@ -512,8 +518,9 @@ export default function EnergyBaeDashboard() {
                                             }}
                                             className="bg-transparent text-sm font-bold outline-none focus:text-indigo-600" 
                                          />
-                                      </div>
+                                      </motion.div>
                                    ))}
+
                                 </div>
                              </div>
                           </div>
@@ -528,7 +535,7 @@ export default function EnergyBaeDashboard() {
                              </div>
                              <button 
                                 onClick={generateExcel}
-                                className="bg-indigo-600 hover:bg-indigo-500 text-background dark:text-black font-black uppercase tracking-widest text-xs px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/10 transition-all flex items-center gap-3"
+                                className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 hover:scale-[1.02] hover:gold-glow text-background dark:text-black font-black uppercase tracking-widest text-xs px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/10 transition-all flex items-center gap-3"
                              >
                                 <FileSpreadsheet className="w-4 h-4" /> Finalize Official Report
                              </button>
@@ -537,7 +544,7 @@ export default function EnergyBaeDashboard() {
                     )}
 
                     {activeTab === 'verify' && !extractedData && (
-                       <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="enterprise-card p-12 rounded-[4rem] h-[580px] flex flex-col items-center justify-center text-center space-y-6">
+                       <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="luxury-card p-12 rounded-[4rem] h-[580px] flex flex-col items-center justify-center text-center space-y-6">
                           <div className="w-24 h-24 bg-card border border-border rounded-[2rem] flex items-center justify-center shadow-inner">
                              <ClipboardList className="w-12 h-12 text-slate-300 dark:text-slate-700" />
                           </div>
@@ -549,7 +556,7 @@ export default function EnergyBaeDashboard() {
                     )}
 
 {activeTab === 'chat' && (
-                       <motion.div key="chat" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="enterprise-card p-8 rounded-[4rem] h-[550px] flex flex-col">
+                       <motion.div key="chat" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="luxury-card p-8 rounded-[4rem] h-[550px] flex flex-col">
                           <div className="flex items-center gap-4 mb-6 px-4">
                              <Bot className="w-6 h-6 text-indigo-600" />
                              <div>
@@ -561,7 +568,7 @@ export default function EnergyBaeDashboard() {
                           <div className="flex-1 overflow-y-auto space-y-6 px-4 pb-4">
                              {chatHistory.map((msg, i) => (
                                <div key={i} className={clsx("flex flex-col max-w-[80%]", msg.role === 'user' ? "ml-auto items-end" : "items-start")}>
-                                  <div className={clsx("p-6 rounded-[2rem] text-sm leading-relaxed shadow-lg", msg.role === 'user' ? "bg-indigo-600 text-background dark:text-black font-medium rounded-tr-sm" : "bg-card border border-border rounded-tl-sm")}>
+                                  <div className={clsx("p-6 rounded-[2rem] text-sm leading-relaxed shadow-lg", msg.role === 'user' ? "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-background dark:text-black font-medium rounded-tr-sm" : "bg-card border border-border rounded-tl-sm")}>
                                     {msg.text}
                                   </div>
                                   <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 mt-2">
@@ -581,7 +588,7 @@ export default function EnergyBaeDashboard() {
                                placeholder="Ask questions about the audit..."
                                className="flex-1 bg-card border border-border rounded-[2rem] px-8 py-4 outline-none focus:border-slate-500/50 transition-colors"
                              />
-                             <button onClick={handleSendMessage} className="w-16 h-16 rounded-[2rem] bg-indigo-600 flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-background dark:text-black">
+                             <button onClick={handleSendMessage} className="w-16 h-16 rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-background dark:text-black">
                                <Send className="w-6 h-6" />
                              </button>
                           </div>
@@ -590,14 +597,14 @@ export default function EnergyBaeDashboard() {
 
 {activeTab === 'impact' && (
                        <motion.div key="impact" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="grid grid-cols-1 md:grid-cols-2 gap-8 h-[550px]">
-                          <div className="enterprise-card p-12 rounded-[4rem] flex flex-col justify-center items-center text-center">
+                          <div className="luxury-card p-12 rounded-[4rem] flex flex-col justify-center items-center text-center">
                              <div className="w-24 h-24 rounded-full bg-emerald-500/10 flex items-center justify-center mb-8">
                                 <TreeDeciduous className="w-12 h-12 text-emerald-500" />
                              </div>
                              <h4 className="text-7xl font-black text-emerald-500 tracking-tight">{treesSaved}</h4>
                              <p className="text-sm font-black uppercase tracking-widest text-muted-foreground">Trees Saved Annually</p>
                           </div>
-                          <div className="enterprise-card p-12 rounded-[4rem] flex flex-col justify-center items-center text-center">
+                          <div className="luxury-card p-12 rounded-[4rem] flex flex-col justify-center items-center text-center">
                              <div className="w-24 h-24 rounded-full bg-blue-500/10 flex items-center justify-center mb-8">
                                 <Globe className="w-12 h-12 text-blue-500" />
                              </div>
@@ -608,7 +615,7 @@ export default function EnergyBaeDashboard() {
                     )}
 
                     {activeTab === 'audit' && (
-                      <motion.div key="audit" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="enterprise-card p-12 rounded-[4rem] h-[550px] relative">
+                      <motion.div key="audit" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="luxury-card p-12 rounded-[4rem] h-[550px] relative">
                          <div className="flex justify-between items-center mb-10">
                             <h3 className="text-2xl font-black flex items-center gap-4">
                                <BarChart3 className="w-6 h-6 text-indigo-600" /> Historical Consumption Profile
@@ -629,7 +636,7 @@ export default function EnergyBaeDashboard() {
                     )}
 
                     {activeTab === 'forecast' && (
-                       <motion.div key="forecast" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="enterprise-card p-12 rounded-[4rem] h-[550px] relative">
+                       <motion.div key="forecast" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="luxury-card p-12 rounded-[4rem] h-[550px] relative">
                           <div className="flex justify-between items-center mb-10">
                              <h3 className="text-2xl font-black flex items-center gap-4">
                                 <TrendingUp className="w-6 h-6 text-indigo-600" /> Predictive Projections
@@ -684,7 +691,7 @@ export default function EnergyBaeDashboard() {
 function NavInfo({ label, value }: { label: string, value: string }) {
   return (
     <div className="text-right">
-       <p className="text-[9px] font-black text-slate-600 uppercase tracking-widest leading-none mb-1">{label}</p>
+       <p className="text-[9px] font-black text-indigo-400 font-bold uppercase tracking-[0.2em] tracking-widest leading-none mb-1">{label}</p>
        <p className="text-[11px] font-black text-foreground uppercase leading-none">{value}</p>
     </div>
   );
