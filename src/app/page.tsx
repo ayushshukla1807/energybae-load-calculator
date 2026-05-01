@@ -287,6 +287,7 @@ export default function EnergyBaeDashboard() {
                               : (file ? file.name : "Secure Document Upload")}
                           </p>
                           <p className="text-[10px] font-black text-indigo-400 font-bold uppercase tracking-[0.2em] tracking-widest">
+                           <button onClick={(e) => { e.preventDefault(); loadDemo(); }} className="mt-2 text-[8px] font-black text-indigo-500/50 hover:text-indigo-500 uppercase tracking-widest transition-colors underline decoration-dotted block">Bypass for Showcase (Demo Mode)</button>
                             {isBatchMode ? "High-Volume Parallel Processing" : "MSEDCL Audit Interface Active"}
                           </p>
                        </div>
