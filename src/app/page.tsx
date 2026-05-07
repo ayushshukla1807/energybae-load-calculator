@@ -134,18 +134,145 @@ export default function EnergyBaeDashboard() {
     try {
       setAgentThoughts(prev => [...prev, { type: 'vision', message: `Initializing Multi-Provider Neural Engine (Target: ${selectedProvider.toUpperCase()})...`, confidence: 1.0 }]);
       await new Promise(r => setTimeout(r, 800));
-      setAgentThoughts(prev => [...prev, { type: 'extract', message: "Parsing consumption vectors and consumer identity...", confidence: 0.98 }]);
-      await new Promise(r => setTimeout(r, 1000));
-      setAgentThoughts(prev => [...prev, { type: 'validate', message: `Cross-referencing ${selectedProvider.toUpperCase()} tariff structures...`, confidence: 0.96 }]);
-      await new Promise(r => setTimeout(r, 1200));
-      setAgentThoughts(prev => [...prev, { type: 'audit', message: "Calculating Solar ROI & 25-Year Impact vectors...", confidence: 0.97 }]);
-      await new Promise(r => setTimeout(r, 1000));
-      setAgentThoughts(prev => [...prev, { type: 'predict', message: "Finalizing Technical Audit & Proposal generation...", confidence: 0.99 }]);
+      setAgentThoughts(prev => [...prev, { type: 'extract', message: "Loading Gemini Vision model for document parsing...", confidence: 0.98 }]);
+      await new Promise(r => setTimeout(r, 600));
+
+      // ================================================================
+      // STRATEGY: Call Gemini Vision directly from browser (no timeout)
+      // This bypasses Vercel's 10s serverless function limit entirely.
+      // ================================================================
+      const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || apiKey;
+      
+      if (file && GEMINI_API_KEY && GEMINI_API_KEY !== "DEMO") {
+        setAgentThoughts(prev => [...prev, { type: 'validate', message: `Sending ${file.name} to Gemini Vision — analyzing bill layout...`, confidence: 0.96 }]);
+        
+        const fileBase64 = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            const base64 = (reader.result as string).split(',')[1];
+            resolve(base64);
+          };
+          reader.readAsDataURL(file);
+        });
+
+        const prompt = `You are an expert Indian electricity bill analyst trained on MSEDCL, BESCOM, TNEB, KSEB, BRPL, and all state discom formats.
+
+Extract ALL data from this electricity bill with 100% accuracy. Read EVERY number carefully.
+
+EXTRACTION RULES:
+1. consumerName: Full consumer/customer name on the bill
+2. consumerNo: The unique consumer number / account number / GGN (usually 10-12 digits). Look for "Consumer No", "Grahak Kramank", "GGN", "Account No", "CA No"
+3. billingUnit: The subdivision/billing unit code (4-digit number like 4599, 4393)
+4. sanctionedLoad: Approved load in KW. Convert HP to KW (multiply by 0.746). Look for "Sanctioned Load", "Manjur Bhaar"
+5. fixedCharges: Monthly fixed/demand charges in INR. Look for "Fixed Charges", "Sthir Aakar"
+6. connectionType: Tariff category (e.g. "92/LT I Res 3-Phase", "LT II Commercial")
+7. billAmount: Total payable amount (the FINAL total, not subtotal)
+8. billingHistory: Extract up to 12 months from the bar chart or history table. CRITICAL: Read each bar value carefully. Sort oldest to newest.
+
+Return ONLY valid JSON, no markdown:
+{
+  "consumerName": "string",
+  "consumerNo": "string",
+  "billingUnit": "string",
+  "fixedCharges": number,
+  "sanctionedLoad": number,
+  "connectionType": "string",
+  "billAmount": number,
+  "billingHistory": [{"month": "Apr 2025", "units": 1370}],
+  "aiInsights": {"loadEfficiency": "High", "seasonalityIndex": "1.2x", "confidence": 0.97, "modelUsed": "gemini-2.0-flash"}
+}`;
+
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: prompt },
+                  { inline_data: { mime_type: file.type || "application/pdf", data: fileBase64 } }
+                ]
+              }]
+            })
+          }
+        );
+
+        if (geminiRes.ok) {
+          const geminiData = await geminiRes.json();
+          const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+          const match = cleaned.match(/\{[\s\S]*\}/);
+          
+          if (match) {
+            const parsed = JSON.parse(match[0]);
+            const hasRealData = parsed.consumerName && parsed.consumerName !== "N/A" && parsed.consumerNo && Array.isArray(parsed.billingHistory) && parsed.billingHistory.length >= 1;
+            
+            if (hasRealData) {
+              setAgentThoughts(prev => [...prev, { type: 'audit', message: `✅ Gemini Vision extracted: ${parsed.consumerName} | ${parsed.billingHistory.length} months loaded`, confidence: parsed.aiInsights?.confidence || 0.95 }]);
+              await new Promise(r => setTimeout(r, 600));
+              setAgentThoughts(prev => [...prev, { type: 'predict', message: "Calculating Solar ROI & 25-Year Impact vectors...", confidence: 0.99 }]);
+              await new Promise(r => setTimeout(r, 500));
+              
+              setExtractedData(parsed);
+              setEditableData(JSON.parse(JSON.stringify(parsed)));
+              setIsExtracting(false);
+              setShowAuditTrail(true);
+              setActiveTab('verify');
+              setChatHistory([{ role: 'bot', text: `Report generated for ${parsed.consumerName}. Consumer No: ${parsed.consumerNo}. ${parsed.billingHistory.length} months of consumption data loaded. Verification workspace is active.` }]);
+              return;
+            }
+          }
+        }
+        
+        // If gemini-2.0-flash failed, try gemini-1.5-flash
+        setAgentThoughts(prev => [...prev, { type: 'validate', message: "Cascading to Gemini 1.5 Flash backup model...", confidence: 0.92 }]);
+        const geminiRes2 = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{
+                parts: [
+                  { text: prompt },
+                  { inline_data: { mime_type: file.type || "application/pdf", data: fileBase64 } }
+                ]
+              }]
+            })
+          }
+        );
+        if (geminiRes2.ok) {
+          const geminiData2 = await geminiRes2.json();
+          const text2 = geminiData2?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+          const cleaned2 = text2.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
+          const match2 = cleaned2.match(/\{[\s\S]*\}/);
+          if (match2) {
+            const parsed2 = JSON.parse(match2[0]);
+            if (parsed2.consumerName && parsed2.billingHistory?.length >= 1) {
+              setExtractedData(parsed2);
+              setEditableData(JSON.parse(JSON.stringify(parsed2)));
+              setIsExtracting(false);
+              setShowAuditTrail(true);
+              setActiveTab('verify');
+              return;
+            }
+          }
+        }
+      }
+
+      // ================================================================
+      // FALLBACK: Server-side API (for demo mode or no client key)
+      // ================================================================
+      setAgentThoughts(prev => [...prev, { type: 'audit', message: "Routing to server extraction engine...", confidence: 0.94 }]);
       await new Promise(r => setTimeout(r, 800));
+      setAgentThoughts(prev => [...prev, { type: 'predict', message: "Finalizing Technical Audit & Proposal generation...", confidence: 0.99 }]);
+      await new Promise(r => setTimeout(r, 600));
 
       const formData = new FormData();
       if (file) formData.append("file", file);
       if (apiKey) formData.append("apiKey", apiKey);
+      if (isDemoMode) formData.append("demoMode", "true");
       
       const res = await fetch("/api/extract", { method: "POST", body: formData });
       const data = await res.json();
@@ -163,6 +290,7 @@ export default function EnergyBaeDashboard() {
       setIsExtracting(false);
     }
   };
+
 
   const generateExcel = async () => {
     if (!editableData) return;
