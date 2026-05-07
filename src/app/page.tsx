@@ -610,7 +610,9 @@ export default function EnergyBaeDashboard() {
                              </button>
                           </div>
                        </motion.div>
-                     {activeTab === 'impact' && (
+                    )}
+
+                    {activeTab === 'impact' && (
                        <motion.div key="impact" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 h-[550px] overflow-y-auto custom-scrollbar-dark pr-2 md:pr-4">
                           <div className="luxury-card p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] bg-gradient-to-br from-emerald-500/5 to-transparent border border-emerald-500/10 col-span-1 md:col-span-2">
                              <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
