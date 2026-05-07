@@ -70,8 +70,22 @@
     @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400;
   }
 
-  .gold-glow {
-    box-shadow: 0 0 50px -10px rgba(99, 102, 241, 0.2);
+  .gold-glow { box-shadow: 0 0 20px rgba(255, 255, 255, 0.1); }
+  
+  @keyframes beam-move {
+    0% { left: -100%; }
+    100% { left: 100%; }
+  }
+  .animate-beam-move {
+    animation: beam-move 3s linear infinite;
+  }
+
+  @keyframes scan {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+  }
+  .animate-scan {
+    animation: scan 2s ease-in-out infinite alternate;
   }
 
   .custom-scrollbar-dark::-webkit-scrollbar {
