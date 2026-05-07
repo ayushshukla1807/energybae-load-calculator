@@ -37,13 +37,58 @@ export async function POST(req: NextRequest) {
         // Only fill up to 12 months starting from row 9
         if (index < 12) {
           const rowNumber = 9 + index;
-          // Update the Month label (Column C)
-          sheet.getCell(`C${rowNumber}`).value = historyItem.month;
+          // Update the Month label (Column C) - ensure it's text
+          const cCell = sheet.getCell(`C${rowNumber}`);
+          cCell.value = historyItem.month;
+          cCell.numFmt = '@';
+          
           // Update the Units consumed (Column D)
           sheet.getCell(`D${rowNumber}`).value = parseFloat(historyItem.units) || 0;
-          // Note: Column E (Bill Amount) and F (Unit Cost) are left untouched or kept as formula if they exist.
         }
       });
+    }
+
+    // Clear out the dummy data for Consumer 2 (Ranjana) to make it look professional
+    ['H1', 'H2', 'H3', 'H4', 'H5'].forEach(c => { sheet.getCell(c).value = null; });
+    for (let i = 8; i <= 22; i++) {
+      ['G', 'H', 'I', 'J'].forEach(col => {
+        sheet.getCell(`${col}${i}`).value = null;
+      });
+    }
+
+    // =========================================================
+    // ADD SOLAR LOAD CALCULATION TO SATISFY ASSIGNMENT REQ
+    // =========================================================
+    const calcSheet = workbook.addWorksheet('Solar Calculation');
+    calcSheet.columns = [
+      { header: 'Solar Parameter', key: 'param', width: 35 },
+      { header: 'Value', key: 'value', width: 25 },
+      { header: 'Unit', key: 'unit', width: 15 }
+    ];
+    
+    // Header styling
+    calcSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 12 };
+    calcSheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1B5E20' } };
+    calcSheet.getRow(1).alignment = { horizontal: 'center' };
+
+    // Parameters & Calculations
+    calcSheet.addRow(['Average Monthly Consumption', { formula: "='Pranay HOME'!D22" }, 'kWh/month']);
+    calcSheet.addRow(['Daily Consumption', { formula: '=ROUND(B2/30, 2)' }, 'kWh/day']);
+    calcSheet.addRow(['Peak Sun Hours (India Avg)', 4.5, 'hrs/day']);
+    calcSheet.addRow(['System Performance Ratio (PR)', 0.75, 'ratio']);
+    calcSheet.addRow(['Recommended Solar System Size', { formula: '=ROUNDUP((B3/(B4*B5)), 1)' }, 'kW']);
+    calcSheet.addRow(['Estimated Total Cost (@ ₹50,000/kW)', { formula: '=B6*50000' }, '₹']);
+    calcSheet.addRow(['Estimated Annual Savings', { formula: '=ROUND(B2*12*8.5, 0)' }, '₹ (@ ₹8.5/unit)']);
+    calcSheet.addRow(['Simple Payback Period', { formula: '=ROUND(B7/B8, 1)' }, 'Years']);
+    calcSheet.addRow(['25-Year Wealth Generation', { formula: '=ROUND((B8*25)-B7, 0)' }, '₹']);
+
+    // Formatting the calculation sheet
+    for(let i=2; i<=10; i++) {
+      calcSheet.getCell(`A${i}`).font = { bold: true };
+      calcSheet.getCell(`B${i}`).alignment = { horizontal: 'center' };
+      if (['B7', 'B8', 'B10'].includes(`B${i}`)) {
+        calcSheet.getCell(`B${i}`).numFmt = '₹#,##0.00';
+      }
     }
 
     // Force Excel to recalculate formulas upon opening
@@ -54,7 +99,7 @@ export async function POST(req: NextRequest) {
 
     return new NextResponse(buffer, {
       headers: {
-        "Content-Disposition": "attachment; filename=EnergyBae_Solar_Load_Calculated.xlsx",
+        "Content-Disposition": `attachment; filename="EnergyBae_Audit_${(data.consumerName || 'Report').replace(/[^a-zA-Z0-9]/g, '_')}.xlsx"`,
         "Content-Type": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
       },
     });
