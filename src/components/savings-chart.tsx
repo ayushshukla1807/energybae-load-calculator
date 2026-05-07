@@ -47,7 +47,8 @@ export function SavingsChart({ yearlySavings, years = 25 }: SavingsChartProps) {
               fontSize: '12px',
               fontWeight: 'bold'
             }}
-            formatter={(value: number) => [`₹${value.toLocaleString()}`, 'Cumulative Savings']}
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            formatter={(value: any) => [`₹${Number(value).toLocaleString()}`, 'Cumulative Savings']}
           />
           <Area 
             type="monotone" 
