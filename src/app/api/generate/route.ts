@@ -1,98 +1,178 @@
 import { NextRequest, NextResponse } from "next/server";
 import ExcelJS from "exceljs";
-import path from "path";
 
 export async function POST(req: NextRequest) {
   try {
     const data = await req.json();
     
-    // As per the EnergyBae intern task brief: 
-    // "The extracted data is filled into the provided Excel template and the solar load is calculated."
-    // "The Excel template has specific formulas — do not overwrite them. Only fill the input cells."
-    
+    // Create a pristine new workbook from scratch instead of using the messy template
     const workbook = new ExcelJS.Workbook();
-    
-    // Load the provided template from the public directory
-    const templatePath = path.join(process.cwd(), 'public', 'template.xlsx');
-    await workbook.xlsx.readFile(templatePath);
-    
-    const sheet = workbook.worksheets[0];
-    
-    // Update the Primary Consumer Input Cells (Column D)
-    sheet.getCell('D1').value = data.consumerName || "N/A";
-    sheet.getCell('D2').value = data.consumerNo || "N/A";
-    
-    // Convert fixed charges string to number if needed
-    const fCharges = parseFloat(data.fixedCharges?.toString().replace(/[^0-9.]/g, '')) || 0;
-    sheet.getCell('D3').value = fCharges;
-    
-    // Leave 'KW' in the string if it's there
-    sheet.getCell('D4').value = `${parseFloat(data.sanctionedLoad?.toString().replace(/[^0-9.]/g, '')) || 0}KW`;
-    
-    sheet.getCell('D5').value = data.connectionType || "N/A";
+    workbook.creator = 'EnergyBae AI Audit';
+    workbook.created = new Date();
 
-    // Fill the Billing History (Units) in the exact cells (Row 9 to 20 for 12 months)
+    // ==========================================
+    // SHEET 1: EXTRACTED BILL DATA
+    // ==========================================
+    const sheet1 = workbook.addWorksheet('Extracted Bill Data');
+    
+    // Set column widths
+    sheet1.columns = [
+      { width: 25 }, // A: Parameter
+      { width: 35 }, // B: Value
+      { width: 10 }, // C: Spacer
+      { width: 15 }, // D: Month
+      { width: 15 }, // E: Units
+    ];
+
+    // Header Styles
+    const headerStyle = {
+      font: { bold: true, color: { argb: 'FFFFFFFF' }, size: 12 },
+      fill: { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'FF1B5E20' } },
+      alignment: { vertical: 'middle' as const, horizontal: 'center' as const }
+    };
+
+    const labelStyle = {
+      font: { bold: true, color: { argb: 'FF333333' } },
+      fill: { type: 'pattern' as const, pattern: 'solid' as const, fgColor: { argb: 'FFF5F5F5' } },
+      border: { bottom: { style: 'thin' as const, color: { argb: 'FFDDDDDD' } } },
+      alignment: { vertical: 'middle' as const }
+    };
+
+    const valueStyle = {
+      border: { bottom: { style: 'thin' as const, color: { argb: 'FFDDDDDD' } } },
+      alignment: { vertical: 'middle' as const, horizontal: 'left' as const }
+    };
+
+    // Consumer Details Section
+    sheet1.mergeCells('A1:B1');
+    sheet1.getCell('A1').value = 'CONSUMER DETAILS';
+    sheet1.getCell('A1').style = headerStyle;
+
+    const consumerDetails = [
+      ['Consumer Name', data.consumerName || 'N/A'],
+      ['Consumer Number', data.consumerNo || 'N/A'],
+      ['Billing Unit', data.billingUnit || 'N/A'],
+      ['Sanctioned Load', `${parseFloat(data.sanctionedLoad?.toString().replace(/[^0-9.]/g, '')) || 0} KW`],
+      ['Fixed Charges', `₹ ${parseFloat(data.fixedCharges?.toString().replace(/[^0-9.]/g, '')) || 0}`],
+      ['Connection Type', data.connectionType || 'N/A'],
+      ['Total Bill Amount', `₹ ${data.billAmount || 0}`]
+    ];
+
+    consumerDetails.forEach((row, idx) => {
+      const rowIndex = idx + 2;
+      sheet1.getCell(`A${rowIndex}`).value = row[0];
+      sheet1.getCell(`A${rowIndex}`).style = labelStyle;
+      sheet1.getCell(`B${rowIndex}`).value = row[1];
+      sheet1.getCell(`B${rowIndex}`).style = valueStyle;
+    });
+
+    // Billing History Section
+    sheet1.mergeCells('D1:E1');
+    sheet1.getCell('D1').value = '12-MONTH CONSUMPTION HISTORY';
+    sheet1.getCell('D1').style = headerStyle;
+
+    sheet1.getCell('D2').value = 'Month';
+    sheet1.getCell('D2').style = labelStyle;
+    sheet1.getCell('D2').alignment = { horizontal: 'center' };
+    
+    sheet1.getCell('E2').value = 'Units (kWh)';
+    sheet1.getCell('E2').style = labelStyle;
+    sheet1.getCell('E2').alignment = { horizontal: 'center' };
+
+    let totalUnits = 0;
+    let monthsCount = 0;
+
     if (data.billingHistory && Array.isArray(data.billingHistory)) {
       data.billingHistory.forEach((historyItem: any, index: number) => {
-        // Only fill up to 12 months starting from row 9
         if (index < 12) {
-          const rowNumber = 9 + index;
-          // Update the Month label (Column C) - ensure it's text
-          const cCell = sheet.getCell(`C${rowNumber}`);
-          cCell.value = historyItem.month;
-          cCell.numFmt = '@';
+          const r = index + 3;
+          sheet1.getCell(`D${r}`).value = historyItem.month;
+          sheet1.getCell(`D${r}`).alignment = { horizontal: 'center' };
+          sheet1.getCell(`D${r}`).border = { bottom: { style: 'thin', color: { argb: 'FFEEEEEE' } } };
           
-          // Update the Units consumed (Column D)
-          sheet.getCell(`D${rowNumber}`).value = parseFloat(historyItem.units) || 0;
+          const units = parseFloat(historyItem.units) || 0;
+          sheet1.getCell(`E${r}`).value = units;
+          sheet1.getCell(`E${r}`).alignment = { horizontal: 'center' };
+          sheet1.getCell(`E${r}`).border = { bottom: { style: 'thin', color: { argb: 'FFEEEEEE' } } };
+          
+          totalUnits += units;
+          monthsCount++;
         }
       });
     }
 
-    // Clear out the dummy data for Consumer 2 (Ranjana) to make it look professional
-    ['H1', 'H2', 'H3', 'H4', 'H5'].forEach(c => { sheet.getCell(c).value = null; });
-    for (let i = 8; i <= 22; i++) {
-      ['G', 'H', 'I', 'J'].forEach(col => {
-        sheet.getCell(`${col}${i}`).value = null;
-      });
-    }
-
-    // =========================================================
-    // ADD SOLAR LOAD CALCULATION TO SATISFY ASSIGNMENT REQ
-    // =========================================================
-    const calcSheet = workbook.addWorksheet('Solar Calculation');
-    calcSheet.columns = [
-      { header: 'Solar Parameter', key: 'param', width: 35 },
-      { header: 'Value', key: 'value', width: 25 },
-      { header: 'Unit', key: 'unit', width: 15 }
-    ];
+    const avgMonthlyUnits = monthsCount > 0 ? Math.round(totalUnits / monthsCount) : 0;
+    const lastHistoryRow = Math.max(3 + monthsCount, 3);
     
-    // Header styling
-    calcSheet.getRow(1).font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 12 };
-    calcSheet.getRow(1).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1B5E20' } };
-    calcSheet.getRow(1).alignment = { horizontal: 'center' };
+    sheet1.getCell(`D${lastHistoryRow}`).value = 'Monthly Average';
+    sheet1.getCell(`D${lastHistoryRow}`).style = { font: { bold: true }, alignment: { horizontal: 'center' }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF3E0' } } };
+    
+    sheet1.getCell(`E${lastHistoryRow}`).value = avgMonthlyUnits;
+    sheet1.getCell(`E${lastHistoryRow}`).style = { font: { bold: true }, alignment: { horizontal: 'center' }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF3E0' } } };
 
-    // Parameters & Calculations
-    calcSheet.addRow(['Average Monthly Consumption', { formula: "='Pranay HOME'!D22" }, 'kWh/month']);
-    calcSheet.addRow(['Daily Consumption', { formula: '=ROUND(B2/30, 2)' }, 'kWh/day']);
-    calcSheet.addRow(['Peak Sun Hours (India Avg)', 4.5, 'hrs/day']);
-    calcSheet.addRow(['System Performance Ratio (PR)', 0.75, 'ratio']);
-    calcSheet.addRow(['Recommended Solar System Size', { formula: '=ROUNDUP((B3/(B4*B5)), 1)' }, 'kW']);
-    calcSheet.addRow(['Estimated Total Cost (@ ₹50,000/kW)', { formula: '=B6*50000' }, '₹']);
-    calcSheet.addRow(['Estimated Annual Savings', { formula: '=ROUND(B2*12*8.5, 0)' }, '₹ (@ ₹8.5/unit)']);
-    calcSheet.addRow(['Simple Payback Period', { formula: '=ROUND(B7/B8, 1)' }, 'Years']);
-    calcSheet.addRow(['25-Year Wealth Generation', { formula: '=ROUND((B8*25)-B7, 0)' }, '₹']);
 
-    // Formatting the calculation sheet
-    for(let i=2; i<=10; i++) {
-      calcSheet.getCell(`A${i}`).font = { bold: true };
-      calcSheet.getCell(`B${i}`).alignment = { horizontal: 'center' };
-      if (['B7', 'B8', 'B10'].includes(`B${i}`)) {
-        calcSheet.getCell(`B${i}`).numFmt = '₹#,##0.00';
+    // ==========================================
+    // SHEET 2: SOLAR CALCULATION
+    // ==========================================
+    const sheet2 = workbook.addWorksheet('Solar Calculation');
+    
+    sheet2.columns = [
+      { width: 35 }, // A: Parameter
+      { width: 25 }, // B: Value
+      { width: 20 }, // C: Unit/Note
+    ];
+
+    sheet2.mergeCells('A1:C1');
+    sheet2.getCell('A1').value = 'SOLAR SYSTEM RECOMMENDATION & ROI';
+    sheet2.getCell('A1').style = headerStyle;
+
+    const dailyConsumption = Number((avgMonthlyUnits / 30).toFixed(2));
+    const peakSunHours = 4.5;
+    const pr = 0.75;
+    // System Size = Daily Consumption / (Peak Sun Hours * PR)
+    const rawSystemSize = dailyConsumption / (peakSunHours * pr);
+    const recommendedSize = Math.ceil(rawSystemSize * 10) / 10; // Round up to 1 decimal place
+    const systemCost = recommendedSize * 50000;
+    const avgTariff = 8.5; // Assume ₹8.5 per unit
+    const annualSavings = avgMonthlyUnits * 12 * avgTariff;
+    const payback = annualSavings > 0 ? Number((systemCost / annualSavings).toFixed(1)) : 0;
+    const wealth25y = (annualSavings * 25) - systemCost;
+
+    const solarData = [
+      ['Average Monthly Consumption', avgMonthlyUnits, 'kWh / month'],
+      ['Average Daily Consumption', dailyConsumption, 'kWh / day'],
+      ['Peak Sun Hours (India Avg)', peakSunHours, 'hours / day'],
+      ['System Performance Ratio', pr, 'efficiency ratio'],
+      ['Recommended Solar System Size', recommendedSize, 'kW'],
+      ['Estimated Total Cost', systemCost, '₹ (@ ₹50,000/kW)'],
+      ['Estimated Annual Savings', annualSavings, `₹ (@ ₹${avgTariff}/unit)`],
+      ['Simple Payback Period', payback, 'Years'],
+      ['25-Year Wealth Generation', wealth25y, '₹ (Net Profit)']
+    ];
+
+    solarData.forEach((row, idx) => {
+      const rowIndex = idx + 2;
+      sheet2.getCell(`A${rowIndex}`).value = row[0];
+      sheet2.getCell(`A${rowIndex}`).style = labelStyle;
+      
+      sheet2.getCell(`B${rowIndex}`).value = row[1];
+      sheet2.getCell(`B${rowIndex}`).style = valueStyle;
+      sheet2.getCell(`B${rowIndex}`).alignment = { horizontal: 'center', vertical: 'middle' };
+      
+      // Format currency
+      if ([5, 6, 8].includes(idx)) {
+        sheet2.getCell(`B${rowIndex}`).numFmt = '₹#,##0';
       }
-    }
 
-    // Force Excel to recalculate formulas upon opening
-    workbook.calcProperties.fullCalcOnLoad = true;
+      sheet2.getCell(`C${rowIndex}`).value = row[2];
+      sheet2.getCell(`C${rowIndex}`).style = { font: { italic: true, color: { argb: 'FF888888' } }, alignment: { vertical: 'middle' } };
+    });
+
+    // Highlight the final output rows
+    ['A6', 'B6', 'C6', 'A8', 'B8', 'C8', 'A10', 'B10', 'C10'].forEach(cell => {
+      sheet2.getCell(cell).fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE8F5E9' } };
+      sheet2.getCell(cell).font = { bold: true, color: { argb: 'FF1B5E20' } };
+    });
 
     // Generate the output buffer
     const buffer = await workbook.xlsx.writeBuffer();
