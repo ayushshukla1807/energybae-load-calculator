@@ -78,6 +78,7 @@ export async function POST(req: NextRequest) {
     // 4. Monthly Usage Data (Rows 9-20)
     let totalUnits = 0;
     const history = data.billingHistory || [];
+    const monthsCount = history.length;
     
     // Ensure we show 12 rows even if data is missing
     for (let i = 0; i < 12; i++) {
@@ -95,18 +96,38 @@ export async function POST(req: NextRequest) {
       sheet.getRow(row).alignment = { horizontal: 'center' };
     }
 
-    // 5. Technical Calculations (Rows 22-26)
-    const avgMonthlyUnits = Math.round(totalUnits / 12);
-    const solarKwReq = Math.ceil((avgMonthlyUnits / 30 / (4.5 * 0.75)) * 10) / 10;
-    const numPanels = Math.ceil((solarKwReq * 1000) / 540);
-    const actualCapacity = (numPanels * 540) / 1000;
+    // 5. Technical Calculations (Rows 22-30)
+    const avgMonthlyUnits = monthsCount > 0 ? Math.round(totalUnits / monthsCount) : 0;
+    const dailyConsumption = Number((avgMonthlyUnits / 30).toFixed(2));
+    const peakSunHours = 4.5;
+    const pr = 0.75;
+    const growthBuffer = 1.20; // 20% load growth
+    const rawSystemSize = (dailyConsumption / (peakSunHours * pr)) * growthBuffer;
+    const recommendedSize = Math.ceil(rawSystemSize * 10) / 10;
+    
+    const grossCost = recommendedSize * 55000;
+    const getSubsidy = (size: number) => {
+        if (size <= 2) return size * 30000;
+        if (size <= 3) return (2 * 30000) + ((size - 2) * 18000);
+        return 78000;
+    };
+    const subsidyAmt = getSubsidy(recommendedSize);
+    const netCost = grossCost - subsidyAmt;
+    
+    const annualSavings = avgMonthlyUnits * 12 * 8.5;
+    const payback = annualSavings > 0 ? Number((netCost / annualSavings).toFixed(1)) : 0;
+    const wealth25y = (annualSavings * 25) - netCost;
 
     const summaryData = [
-      ['Average Units', avgMonthlyUnits],
-      ['Solar kW Requirement', solarKwReq],
-      ['Solar capacity (Wp)', 540],
-      ['Number of Panels', numPanels],
-      ['System Total Capacity (kW)', actualCapacity]
+      ['Average Monthly Units', avgMonthlyUnits],
+      ['Load Expansion Buffer', '20%'],
+      ['Recommended System Size (kW)', recommendedSize],
+      ['Total Estimated Cost', grossCost],
+      ['PM-Surya Ghar Subsidy', subsidyAmt],
+      ['Net Investment Required', netCost],
+      ['Estimated Annual Savings', annualSavings],
+      ['Payback Period (Years)', payback],
+      ['25-Year Wealth Gain', wealth25y]
     ];
 
     summaryData.forEach((row, idx) => {
@@ -115,8 +136,8 @@ export async function POST(req: NextRequest) {
       styleCell(rowIndex, 3, peachFill);
       
       let valFill = peachFill;
-      if (row[0] === 'Solar capacity (Wp)') valFill = yellowFill;
-      if (row[0] === 'Number of Panels') valFill = greenFill;
+      if (row[0] === 'Net Investment Required') valFill = greenFill;
+      if (typeof row[0] === 'string' && row[0].includes('Subsidy')) valFill = yellowFill;
       
       styleCell(rowIndex, 4, valFill, true).value = row[1];
       styleCell(rowIndex, 5, peachFill);

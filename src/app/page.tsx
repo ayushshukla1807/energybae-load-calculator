@@ -181,32 +181,33 @@ export default function EnergyBaeDashboard() {
           reader.readAsDataURL(file);
         });
 
-        const prompt = `You are an expert Indian electricity bill analyst trained on ${selectedProvider.toUpperCase()}, BESCOM, TNEB, KSEB, BRPL, and all state discom formats. This specific bill is from ${selectedProvider.toUpperCase()}.
+        const prompt = `You are a Senior Solar Engineer and Expert Indian Electricity Bill Analyst. Your task is to extract critical auditing data from this ${selectedProvider.toUpperCase()} bill with absolute precision.
+        
+        EXTRACTION PROTOCOL:
+        1. CONSUMER DATA: Extract Name, Consumer No (12 digits for MSEDCL), Billing Unit, and connection type.
+        2. TARIFF VALIDATION: Extract Energy Charges, Fixed Charges, and Total Tax. 
+           - Calculate Rate/Unit = Energy Charges / Total Units.
+           - Ensure the math cross-validates with the Bill Amount.
+        3. CONSUMPTION HISTORY: Extract 12 months of usage units. If a bar chart is present, estimate units with +/- 5% accuracy.
+        4. SANCTIONED LOAD: Extract Load in KW. If in HP, multiply by 0.746.
 
-Extract ALL data from this electricity bill with 100% accuracy. Read EVERY number carefully.
-
-EXTRACTION RULES:
-1. consumerName: Full consumer/customer name on the bill
-2. consumerNo: The unique consumer number / account number / GGN (usually 10-12 digits). Look for "Consumer No", "Grahak Kramank", "GGN", "Account No", "CA No"
-3. billingUnit: The subdivision/billing unit code (4-digit number like 4599, 4393)
-4. sanctionedLoad: Approved load in KW. Convert HP to KW (multiply by 0.746). Look for "Sanctioned Load", "Manjur Bhaar"
-5. fixedCharges: Monthly fixed/demand charges in INR. Look for "Fixed Charges", "Sthir Aakar"
-6. connectionType: Tariff category (e.g. "92/LT I Res 3-Phase", "LT II Commercial")
-7. billAmount: Total payable amount (the FINAL total, not subtotal)
-8. billingHistory: Extract up to 12 months from the bar chart or history table. CRITICAL: Read each bar value carefully. Sort oldest to newest.
-
-Return ONLY valid JSON, no markdown:
-{
-  "consumerName": "string",
-  "consumerNo": "string",
-  "billingUnit": "string",
-  "fixedCharges": number,
-  "sanctionedLoad": number,
-  "connectionType": "string",
-  "billAmount": number,
-  "billingHistory": [{"month": "Apr 2025", "units": 1370}],
-  "aiInsights": {"loadEfficiency": "High", "seasonalityIndex": "1.2x", "confidence": 0.97, "modelUsed": "gemini-2.0-flash"}
-}`;
+        RETURN FORMAT (STRICT JSON):
+        {
+          "consumerName": "string",
+          "consumerNo": "string",
+          "billingUnit": "string",
+          "fixedCharges": number,
+          "sanctionedLoad": number,
+          "connectionType": "string",
+          "billAmount": number,
+          "billingHistory": [{"month": "MMM-YYYY", "units": number}],
+          "aiInsights": {
+            "ratePerUnit": number,
+            "loadFactor": "string",
+            "confidence": number,
+            "suggestedPhase": "1-Phase" | "3-Phase"
+          }
+        }`;
 
         const geminiRes = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -251,7 +252,6 @@ Return ONLY valid JSON, no markdown:
           }
         }
         
-        // If gemini-2.0-flash failed, try gemini-1.5-flash
         setAgentThoughts(prev => [...prev, { type: 'validate', message: "Cascading to Gemini 1.5 Flash backup model...", confidence: 0.92 }]);
         const geminiRes2 = await fetch(
           `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
@@ -287,9 +287,6 @@ Return ONLY valid JSON, no markdown:
         }
       }
 
-      // ================================================================
-      // FALLBACK: Server-side API (for demo mode or no client key)
-      // ================================================================
       setAgentThoughts(prev => [...prev, { type: 'audit', message: "Routing to server extraction engine...", confidence: 0.94 }]);
       await new Promise(r => setTimeout(r, 800));
       setAgentThoughts(prev => [...prev, { type: 'predict', message: "Finalizing Technical Audit & Proposal generation...", confidence: 0.99 }]);
@@ -344,9 +341,30 @@ Return ONLY valid JSON, no markdown:
     return { ...h, isAnomaly, predicted: h.units * (1.12 + Math.random() * 0.05) };
   }) || [];
 
-  const breakEvenYears = (roiInvestment / ((extractedData?.billAmount || 3490) * 12 * 0.75)).toFixed(1);
-  const carbonSaved = (avgUnits * 12 * 0.85).toFixed(1);
-  const treesSaved = (Number(carbonSaved) / 20).toFixed(0);
+  const dailyAvg = avgUnits / 30;
+  const sunHours = 4.5;
+  const pr = 0.75;
+  const growthBuffer = 1.20; // 20% future load expansion
+  const rawSize = (dailyAvg / (sunHours * pr)) * growthBuffer;
+  const recommendedSize = Math.ceil(rawSize * 10) / 10;
+  
+  const calculatedInvestment = recommendedSize * 55000; // ₹55k/kW average market rate
+  
+  // PM-Surya Ghar: Muft Bijli Yojana Subsidy Logic
+  const getSubsidy = (size: number) => {
+    if (size <= 2) return size * 30000;
+    if (size <= 3) return (2 * 30000) + ((size - 2) * 18000);
+    return 78000; // Cap at 3kW
+  };
+  
+  const subsidyAmount = getSubsidy(recommendedSize);
+  const netInvestmentRequired = calculatedInvestment - subsidyAmount;
+  
+  const yearlySavings = avgUnits * 12 * 8.5; // ₹8.5/unit avg residential tariff
+  const breakEvenYears = (netInvestmentRequired / yearlySavings).toFixed(1);
+  
+  const treesSaved = Math.round(avgUnits * 12 * 0.02);
+  const carbonSaved = Math.round(avgUnits * 12 * 0.82); // 0.82 kg CO2 per kWh offset
 
   return (
     <div className="min-h-screen bg-background text-foreground font-body tracking-tight selection:bg-indigo-500/20 overflow-x-hidden relative">
