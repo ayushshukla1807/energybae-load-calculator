@@ -181,7 +181,7 @@ export default function EnergyBaeDashboard() {
           reader.readAsDataURL(file);
         });
 
-        const prompt = `You are an expert Indian electricity bill analyst trained on MSEDCL, BESCOM, TNEB, KSEB, BRPL, and all state discom formats.
+        const prompt = `You are an expert Indian electricity bill analyst trained on ${selectedProvider.toUpperCase()}, BESCOM, TNEB, KSEB, BRPL, and all state discom formats. This specific bill is from ${selectedProvider.toUpperCase()}.
 
 Extract ALL data from this electricity bill with 100% accuracy. Read EVERY number carefully.
 
