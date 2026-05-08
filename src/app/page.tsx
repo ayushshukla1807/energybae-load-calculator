@@ -1,980 +1,355 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
-import { ThemeToggle } from "@/components/theme-toggle";
+import React, { useState, useRef, useEffect } from 'react';
 import { 
-  UploadCloud, Zap, Loader2, Download, AlertCircle, BarChart3, Settings2, IndianRupee, ShieldCheck, RefreshCcw, FileSpreadsheet, ClipboardList,
-  Activity, Lock, Globe, Cpu, Send, Bot, Layers,
-  Fingerprint, Radio, MousePointer2, Pencil, Ruler, Calculator, Box, TrendingUp,
-  ShieldAlert, Sparkles, BrainCircuit, Network, FileCheck2, Info, CheckCircle2,
-  TreeDeciduous, Wind, Leaf, Eye, Search, History, TerminalSquare, Database, Code2
-} from "lucide-react";
-import clsx from "clsx";
-import { 
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer,
-  BarChart, Bar, Cell
-} from "recharts";
-import { motion, AnimatePresence } from "framer-motion";
-import Image from "next/image";
-import { SavingsChart } from "@/components/savings-chart";
-import { ProviderSelector } from "@/components/provider-selector";
+  Upload, 
+  FileSpreadsheet, 
+  Zap, 
+  BrainCircuit, 
+  ShieldCheck, 
+  Leaf, 
+  TrendingUp, 
+  Info,
+  CheckCircle2,
+  Loader2,
+  FileText,
+  Smartphone,
+  IndianRupee,
+  LayoutDashboard
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
-// --- Types ---
-interface BillingHistory {
-  month: string;
-  units: number;
-}
+// ==========================================
+// CONFIGURATION & CONSTANTS
+// ==========================================
+const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY;
 
-interface AIInsights {
-  loadEfficiency: string;
-  seasonalityIndex: string;
-  confidence: number;
-  modelUsed: string;
-}
+const PROVIDERS = [
+  { id: 'msedcl', name: 'MSEDCL (Maharashtra)', color: 'from-orange-500 to-orange-600' },
+  { id: 'adani', name: 'Adani Electricity', color: 'from-blue-500 to-blue-600' },
+  { id: 'tata', name: 'Tata Power', color: 'from-teal-500 to-teal-600' }
+];
 
-interface ExtractedData {
-  consumerName: string;
-  consumerNo: string;
-  billingUnit: string;
-  fixedCharges: number;
-  sanctionedLoad: number;
-  connectionType: string;
-  billAmount: number;
-  billingHistory: BillingHistory[];
-  aiInsights?: AIInsights;
-}
+// ==========================================
+// CORE UI COMPONENTS
+// ==========================================
 
-interface AgentThought {
-  type: 'extract' | 'vision' | 'validate' | 'predict' | 'audit';
-  message: string;
-  confidence: number;
-}
+const Header = () => (
+  <nav className="flex justify-between items-center px-6 md:px-12 py-8 bg-background/50 backdrop-blur-xl sticky top-0 z-50 border-b border-border/50">
+    <div className="flex items-center gap-4">
+      <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
+        <Zap className="text-white w-7 h-7 fill-current" />
+      </div>
+      <div>
+        <h1 className="text-2xl font-black tracking-tighter uppercase leading-none">EnergyBae <span className="text-indigo-600">Pro</span></h1>
+        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.3em] mt-1">Solar Audit Intelligence</p>
+      </div>
+    </div>
+    <div className="hidden md:flex items-center gap-8">
+      <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-500">
+        <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          AI Engine Online
+      </div>
+    </div>
+  </nav>
+);
 
-export default function EnergyBaeDashboard() {
+const FeatureBadge = ({ icon: Icon, text }: { icon: any, text: string }) => (
+  <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-500/5 border border-indigo-500/10 text-[9px] font-black text-indigo-600 uppercase tracking-widest">
+    <Icon className="w-3 h-3" />
+    {text}
+  </div>
+);
+
+// ==========================================
+// MAIN APPLICATION
+// ==========================================
+
+export default function EnergyBaeMasterpiece() {
   const [file, setFile] = useState<File | null>(null);
   const [isExtracting, setIsExtracting] = useState(false);
-  const [extractedData, setExtractedData] = useState<ExtractedData | null>(null);
-  const [editableData, setEditableData] = useState<any>(null);
-  const [isDemoMode, setIsDemoMode] = useState(false);
-  const [apiKey, setApiKey] = useState("");
+  const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const [agentThoughts, setAgentThoughts] = useState<AgentThought[]>([]);
-  const [activeTab, setActiveTab] = useState<'audit' | 'forecast' | 'verify' | 'chat' | 'impact'>('verify');
-  const [selectedModel, setSelectedModel] = useState<'gemini' | 'llama' | 'claude'>('gemini');
-  const [chatMessage, setChatMessage] = useState("");
-  const [chatHistory, setChatHistory] = useState<{role: 'user' | 'bot', text: string}[]>([]);
-  const [roiInvestment, setRoiInvestment] = useState(150000);
-  const [showAuditTrail, setShowAuditTrail] = useState(false);
-  const [isBatchMode, setIsBatchMode] = useState(false);
-  const [batchFiles, setBatchFiles] = useState<File[]>([]);
-  const [selectedProvider, setSelectedProvider] = useState("msedcl");
-  const [isHoveringScanner, setIsHoveringScanner] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
-
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    
-    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
-      if (isBatchMode) {
-        setBatchFiles(Array.from(e.dataTransfer.files));
-      } else {
-        setFile(e.dataTransfer.files[0]);
-        setError(null);
-      }
-    }
-  };
-
-  const loadDemo = () => {
-    setExtractedData({"consumerName":"SHRI MADHUSHAM ROOPCHAND KHOBRAGADE","consumerNo":"439320095567","billingUnit":"2020","fixedCharges":125,"sanctionedLoad":3.3,"connectionType":"90/LT I Res 1-Phase","billAmount":1460,"billingHistory":[{"month":"FEB 2024","units":99},{"month":"MAR 2024","units":151},{"month":"APR 2024","units":258},{"month":"MAY 2024","units":208},{"month":"JUN 2024","units":262},{"month":"JUL 2024","units":95},{"month":"AUG 2024","units":86},{"month":"SEP 2024","units":157},{"month":"OCT 2024","units":146},{"month":"NOV 2024","units":121},{"month":"DEC 2024","units":100},{"month":"JAN 2025","units":25}],"aiInsights":{"modelUsed":"Gemini 2.0 Flash (Primary)","loadEfficiency":"92%","seasonalityIndex":"1.15","confidence":0.99}});
-    setEditableData({"consumerName":"SHRI MADHUSHAM ROOPCHAND KHOBRAGADE","consumerNo":"439320095567","billingUnit":"2020","fixedCharges":125,"sanctionedLoad":3.3,"connectionType":"90/LT I Res 1-Phase","billAmount":1460,"billingHistory":[{"month":"FEB 2024","units":99},{"month":"MAR 2024","units":151},{"month":"APR 2024","units":258},{"month":"MAY 2024","units":208},{"month":"JUN 2024","units":262},{"month":"JUL 2024","units":95},{"month":"AUG 2024","units":86},{"month":"SEP 2024","units":157},{"month":"OCT 2024","units":146},{"month":"NOV 2024","units":121},{"month":"DEC 2024","units":100},{"month":"JAN 2025","units":25}],"aiInsights":{"modelUsed":"Gemini 2.0 Flash (Primary)","loadEfficiency":"92%","seasonalityIndex":"1.15","confidence":0.99}});
-    setActiveTab('verify');
-  };
-
-  const terminalEndRef = useRef<HTMLDivElement>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    terminalEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [agentThoughts]);
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [chatHistory]);
-
-  const triggerInitialChat = () => {
-     if (chatHistory.length === 0) {
-        setTimeout(() => {
-           setChatHistory([{ role: 'bot', text: "Analysis Complete. I am your EnergyBae Assistant. I have mapped the MSEDCL tariff structures to the anomaly vectors. How can I assist you with the technical audit today?" }]);
-        }, 500);
-     }
-  }
-
-  useEffect(() => {
-     if (activeTab === 'chat') triggerInitialChat();
-  }, [activeTab]);
+  const [progress, setProgress] = useState(0);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      setFile(e.target.files[0]);
+    const selected = e.target.files?.[0];
+    if (selected) {
+      setFile(selected);
       setError(null);
+      setData(null);
     }
   };
 
-  const handleSendMessage = () => {
-    if (!chatMessage.trim()) return;
-    const userMsg = chatMessage;
-    setChatHistory(prev => [...prev, { role: 'user', text: userMsg }]);
-    setChatMessage("");
-
-    setTimeout(() => {
-      let botResponse = "Based on the extracted data, the summer months show a higher load consumption. A 3.6kW system is recommended for optimal savings.";
-      if (userMsg.toLowerCase().includes("save") || userMsg.toLowerCase().includes("roi")) {
-        botResponse = `Calculations project an estimated annual savings of ₹${Math.round((extractedData?.billAmount || 3490) * 12 * 0.72)} if the recommended solar array is deployed.`;
-      }
-      setChatHistory(prev => [...prev, { role: 'bot', text: botResponse }]);
-    }, 1200);
-  };
-
-  const handleExtract = async () => {
-    if (!file && !isDemoMode) {
-      setError("Please upload a document first.");
+  const executeAudit = async () => {
+    if (!file || !GEMINI_API_KEY) {
+      setError("Please upload a bill and ensure API Key is configured.");
       return;
     }
 
     setIsExtracting(true);
-    setError(null);
-    setAgentThoughts([]);
-    setExtractedData(null);
-
+    setProgress(20);
+    
     try {
-      setAgentThoughts(prev => [...prev, { type: 'vision', message: `Initializing Multi-Provider Neural Engine (Target: ${selectedProvider.toUpperCase()})...`, confidence: 1.0 }]);
-      await new Promise(r => setTimeout(r, 800));
-      setAgentThoughts(prev => [...prev, { type: 'extract', message: "Loading Gemini Vision model for document parsing...", confidence: 0.98 }]);
-      await new Promise(r => setTimeout(r, 600));
+      const reader = new FileReader();
+      const base64Promise = new Promise<string>((resolve) => {
+        reader.onload = () => resolve((reader.result as string).split(',')[1]);
+        reader.readAsDataURL(file);
+      });
 
-      // ================================================================
-      // STRATEGY: Call Gemini Vision directly from browser (no timeout)
-      // This bypasses Vercel's 10s serverless function limit entirely.
-      // ================================================================
-      const GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || apiKey;
-      
-      if (file && GEMINI_API_KEY && GEMINI_API_KEY !== "DEMO") {
-        setAgentThoughts(prev => [...prev, { type: 'validate', message: `Sending ${file.name} to Gemini Vision — analyzing bill layout...`, confidence: 0.96 }]);
-        
-        const fileBase64 = await new Promise<string>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () => {
-            const base64 = (reader.result as string).split(',')[1];
-            resolve(base64);
-          };
-          reader.readAsDataURL(file);
-        });
+      const base64Data = await base64Promise;
+      setProgress(40);
 
-        const prompt = `You are a Senior Solar Engineer and Expert Indian Electricity Bill Analyst. Your task is to extract critical auditing data from this ${selectedProvider.toUpperCase()} bill with absolute precision.
-        
-        EXTRACTION PROTOCOL:
-        1. CONSUMER DATA: Extract Name, Consumer No (12 digits for MSEDCL), Billing Unit, and connection type.
-        2. TARIFF VALIDATION: Extract Energy Charges, Fixed Charges, and Total Tax. 
-           - Calculate Rate/Unit = Energy Charges / Total Units.
-           - Ensure the math cross-validates with the Bill Amount.
-        3. CONSUMPTION HISTORY: Extract 12 months of usage units. If a bar chart is present, estimate units with +/- 5% accuracy.
-        4. SANCTIONED LOAD: Extract Load in KW. If in HP, multiply by 0.746.
-
-        RETURN FORMAT (STRICT JSON):
+      const prompt = `You are a Senior Solar Engineer. Extract data from this Indian electricity bill.
+        Return ONLY valid JSON:
         {
           "consumerName": "string",
           "consumerNo": "string",
-          "billingUnit": "string",
-          "fixedCharges": number,
           "sanctionedLoad": number,
-          "connectionType": "string",
-          "billAmount": number,
-          "billingHistory": [{"month": "MMM-YYYY", "units": number}],
-          "aiInsights": {
-            "ratePerUnit": number,
-            "loadFactor": "string",
-            "confidence": number,
-            "suggestedPhase": "1-Phase" | "3-Phase"
-          }
+          "fixedCharges": number,
+          "billingHistory": [{"month": "MMM-YY", "units": number}]
         }`;
 
-        const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{
-                parts: [
-                  { text: prompt },
-                  { inline_data: { mime_type: file.type || "application/pdf", data: fileBase64 } }
-                ]
-              }]
-            })
-          }
-        );
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+        method: 'POST',
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: file.type, data: base64Data } }] }]
+        })
+      });
 
-        if (geminiRes.ok) {
-          const geminiData = await geminiRes.json();
-          const text = geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-          const match = cleaned.match(/\{[\s\S]*\}/);
-          
-          if (match) {
-            const parsed = JSON.parse(match[0]);
-            const hasRealData = parsed.consumerName && parsed.consumerName !== "N/A" && parsed.consumerNo && Array.isArray(parsed.billingHistory) && parsed.billingHistory.length >= 1;
-            
-            if (hasRealData) {
-              setAgentThoughts(prev => [...prev, { type: 'audit', message: `✅ Gemini Vision extracted: ${parsed.consumerName} | ${parsed.billingHistory.length} months loaded`, confidence: parsed.aiInsights?.confidence || 0.95 }]);
-              await new Promise(r => setTimeout(r, 600));
-              setAgentThoughts(prev => [...prev, { type: 'predict', message: "Calculating Solar ROI & 25-Year Impact vectors...", confidence: 0.99 }]);
-              await new Promise(r => setTimeout(r, 500));
-              
-              setExtractedData(parsed);
-              setEditableData(JSON.parse(JSON.stringify(parsed)));
-              setIsExtracting(false);
-              setShowAuditTrail(true);
-              setActiveTab('verify');
-              setChatHistory([{ role: 'bot', text: `Report generated for ${parsed.consumerName}. Consumer No: ${parsed.consumerNo}. ${parsed.billingHistory.length} months of consumption data loaded. Verification workspace is active.` }]);
-              return;
-            }
-          }
-        }
-        
-        setAgentThoughts(prev => [...prev, { type: 'validate', message: "Cascading to Gemini 1.5 Flash backup model...", confidence: 0.92 }]);
-        const geminiRes2 = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{
-                parts: [
-                  { text: prompt },
-                  { inline_data: { mime_type: file.type || "application/pdf", data: fileBase64 } }
-                ]
-              }]
-            })
-          }
-        );
-        if (geminiRes2.ok) {
-          const geminiData2 = await geminiRes2.json();
-          const text2 = geminiData2?.candidates?.[0]?.content?.parts?.[0]?.text || "";
-          const cleaned2 = text2.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
-          const match2 = cleaned2.match(/\{[\s\S]*\}/);
-          if (match2) {
-            const parsed2 = JSON.parse(match2[0]);
-            if (parsed2.consumerName && parsed2.billingHistory?.length >= 1) {
-              setExtractedData(parsed2);
-              setEditableData(JSON.parse(JSON.stringify(parsed2)));
-              setIsExtracting(false);
-              setShowAuditTrail(true);
-              setActiveTab('verify');
-              return;
-            }
-          }
-        }
-      }
-
-      setAgentThoughts(prev => [...prev, { type: 'audit', message: "Routing to server extraction engine...", confidence: 0.94 }]);
-      await new Promise(r => setTimeout(r, 800));
-      setAgentThoughts(prev => [...prev, { type: 'predict', message: "Finalizing Technical Audit & Proposal generation...", confidence: 0.99 }]);
-      await new Promise(r => setTimeout(r, 600));
-
-      const formData = new FormData();
-      if (file) formData.append("file", file);
-      if (apiKey) formData.append("apiKey", apiKey);
-      if (isDemoMode) formData.append("demoMode", "true");
+      const result = await res.json();
+      const text = result.candidates[0].content.parts[0].text;
+      const cleanJson = text.replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(cleanJson);
       
-      const res = await fetch("/api/extract", { method: "POST", body: formData });
-      const data = await res.json();
-      
-      if (!res.ok) throw new Error(data.error || "Technical Link Failure.");
-
-      setExtractedData(data);
-      setEditableData(JSON.parse(JSON.stringify(data)));
-      setIsExtracting(false);
-      setShowAuditTrail(true);
-      setActiveTab('verify');
-      setChatHistory([{ role: 'bot', text: "Report Generated. The Verification Workspace is now active. Please review the extracted metrics before finalizing the report." }]);
-    } catch (err: any) {
-      setError(err.message || "A system error occurred during the technical audit.");
+      setProgress(80);
+      setData(parsed);
+      setProgress(100);
+    } catch (err) {
+      setError("Extraction failed. Please try a clearer image.");
+    } finally {
       setIsExtracting(false);
     }
   };
 
-
-  const generateExcel = async () => {
-    if (!editableData) return;
+  const downloadExcel = async () => {
+    if (!data) return;
     try {
-      const res = await fetch("/api/generate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(editableData),
+      const res = await fetch('/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
       });
       const blob = await res.blob();
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
-      a.download = `MSEDCL_Technical_Audit_Analysis.xlsx`;
+      a.download = `Solar_Audit_${data.consumerName.replace(/\s+/g, '_')}.xlsx`;
       a.click();
-    } catch (err: any) {}
+    } catch (err) {
+      console.error(err);
+    }
   };
 
-  const units = extractedData?.billingHistory.map(h => h.units) || [];
-  const avgUnits = units.length > 0 ? units.reduce((a, b) => a + b, 0) / units.length : 0;
-  const stdDev = units.length > 0 ? Math.sqrt(units.map(x => Math.pow(x - avgUnits, 2)).reduce((a, b) => a + b, 0) / units.length) : 0;
+  // Calculations
+  const avgUnits = data?.billingHistory?.length > 0 
+    ? Math.round(data.billingHistory.reduce((a: any, b: any) => a + b.units, 0) / data.billingHistory.length)
+    : 0;
   
-  const forecastData = extractedData?.billingHistory.map((h, i) => {
-    const isAnomaly = Math.abs(h.units - avgUnits) > (1.5 * stdDev);
-    return { ...h, isAnomaly, predicted: h.units * (1.12 + Math.random() * 0.05) };
-  }) || [];
-
-  const dailyAvg = avgUnits / 30;
-  const sunHours = 4.5;
-  const pr = 0.75;
-  const growthBuffer = 1.20; // 20% future load expansion
-  const rawSize = (dailyAvg / (sunHours * pr)) * growthBuffer;
-  const recommendedSize = Math.ceil(rawSize * 10) / 10;
-  
-  const calculatedInvestment = recommendedSize * 55000; // ₹55k/kW average market rate
-  
-  // PM-Surya Ghar: Muft Bijli Yojana Subsidy Logic
-  const getSubsidy = (size: number) => {
-    if (size <= 2) return size * 30000;
-    if (size <= 3) return (2 * 30000) + ((size - 2) * 18000);
-    return 78000; // Cap at 3kW
-  };
-  
-  const subsidyAmount = getSubsidy(recommendedSize);
-  const netInvestmentRequired = calculatedInvestment - subsidyAmount;
-  
-  const yearlySavings = avgUnits * 12 * 8.5; // ₹8.5/unit avg residential tariff
-  const breakEvenYears = (netInvestmentRequired / yearlySavings).toFixed(1);
-  
-  const treesSaved = Math.round(avgUnits * 12 * 0.02);
-  const carbonSaved = Math.round(avgUnits * 12 * 0.82); // 0.82 kg CO2 per kWh offset
+  const solarKw = Math.ceil((avgUnits / 30 / (4.5 * 0.75)) * 1.2 * 10) / 10;
+  const panels = Math.ceil((solarKw * 1000) / 540);
+  const subsidy = solarKw <= 2 ? solarKw * 30000 : (solarKw <= 3 ? 60000 + (solarKw-2)*18000 : 78000);
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-body tracking-tight selection:bg-indigo-500/20 overflow-x-hidden relative">
-      <div className="fixed inset-0 z-0 opacity-[0.03] pointer-events-none">
-        <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-          <defs>
-            <pattern id="grid" width="100" height="100" patternUnits="userSpaceOnUse">
-              <path d="M 100 0 L 0 0 0 100" fill="none" stroke="white" strokeWidth="1"/>
-            </pattern>
-          </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
-        </svg>
-      </div>
+    <div className="min-h-screen bg-[#fafafa] text-slate-900 font-sans selection:bg-indigo-500/10">
+      <Header />
 
-      <nav className="relative z-50 px-6 md:px-12 py-6 md:py-10 flex justify-between items-center">
-        <div className="flex items-center gap-3 md:gap-4 group cursor-pointer" onClick={() => window.location.reload()}>
-          <div className="w-10 h-10 md:w-14 md:h-14 bg-gradient-to-tr from-indigo-600 to-indigo-700 rounded-[1rem] md:rounded-[1.5rem] flex items-center justify-center shadow-xl dark:shadow-2xl shadow-indigo-500/5 dark:shadow-indigo-500/10 group-hover:scale-105 transition-transform">
-            <Zap className="text-background w-6 h-6 md:w-8 md:h-8 fill-current" />
-          </div>
-          <div>
-            <h1 className="text-xl md:text-3xl font-black tracking-tight uppercase leading-none text-foreground">EnergyBae</h1>
-            <p className="text-[8px] md:text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em] mt-1">Solar Audit Automation</p>
-          </div>
+      <main className="max-w-6xl mx-auto px-6 py-12 md:py-20">
+        <div className="text-center mb-16 md:mb-24">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }}
+            className="inline-flex items-center gap-3 px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 mb-8"
+          >
+            <BrainCircuit className="w-4 h-4 text-indigo-600" />
+            <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Neural Audit Engine V2.0</span>
+          </motion.div>
+          <h2 className="text-5xl md:text-8xl font-black tracking-tight leading-[0.9] mb-8">
+            Precision <span className="text-indigo-600">Solar</span> <br />
+            Auditing.
+          </h2>
+          <p className="text-lg md:text-xl text-slate-500 font-medium max-w-2xl mx-auto leading-relaxed">
+            Upload your electricity bill and receive a high-fidelity technical report and ROI analysis in seconds. Optimized for Indian Discoms.
+          </p>
         </div>
-        <ThemeToggle />
 
-        <div className="hidden md:flex items-center gap-10">
-          <NavInfo label="Model Status" value="Online / 14ms" />
-          <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-card relative group cursor-pointer">
-             <Bot className="w-6 h-6 text-muted-foreground group-hover:text-indigo-600 transition-colors" />
-             <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 blur-xl opacity-0 group-hover:opacity-100 rounded-full transition-opacity" />
-          </div>
-        </div>
-      </nav>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          {/* LEFT: UPLOAD & INPUT */}
+          <div className="lg:col-span-5 space-y-8">
+            <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border border-slate-200 shadow-2xl shadow-indigo-500/5 relative overflow-hidden group">
+              <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
+                <LayoutDashboard className="w-24 h-24 text-indigo-600" />
+              </div>
+              
+              <h3 className="text-xl font-black mb-8 flex items-center gap-3">
+                <Upload className="w-5 h-5 text-indigo-600" />
+                Upload Document
+              </h3>
 
-      <main className="relative z-10 max-w-[1600px] mx-auto px-4 md:px-12 py-4 md:py-10">
-        <AnimatePresence mode="wait">
-          {!extractedData ? (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center min-h-[70vh]">
-              <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }}>
-                <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full bg-gradient-to-br from-indigo-500/10 to-purple-500/5 border border-indigo-500/10 mb-10">
-                   <BrainCircuit className="w-4 h-4 text-indigo-600 animate-pulse" />
-                   <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Gemini-Powered Intelligence</span>
-                </div>
-                <h2 className="text-5xl md:text-8xl font-black tracking-tight leading-[0.9] md:leading-[0.8] mb-8 md:mb-12">
-                   Strategic <br className="hidden md:block" />
-                   <span className="text-foreground bg-gradient-to-r from-indigo-500 via-indigo-600 to-blue-600">Forecasting.</span>
-                </h2>
-                <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-xl leading-relaxed mb-8 md:mb-12">
-                   Professional energy intelligence for the Maharashtra region. RAG-grounded multi-modal inference with Gemini 1.5 Flash.
-                </p>
-                
-                <div className="flex flex-wrap gap-4 mb-10">
-                   <button 
-                     onClick={() => setIsBatchMode(false)}
-                     className={clsx("flex-1 md:flex-none px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all text-center", !isBatchMode ? "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg" : "text-muted-foreground hover:bg-card")}
-                   >
-                     Single Audit
-                   </button>
-                   <button 
-                     onClick={() => setIsBatchMode(true)}
-                     className={clsx("flex-1 md:flex-none px-8 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all text-center", isBatchMode ? "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white shadow-lg" : "text-muted-foreground hover:bg-card")}
-                   >
-                     Batch Engine
-                   </button>
-                </div>
-
-                <ProviderSelector selected={selectedProvider} onSelect={setSelectedProvider} />
-
-                {error && (
-                  <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 p-6 bg-red-500/10 border border-red-500/20 rounded-[2rem] flex items-center gap-4 text-red-400 font-bold">
-                    <ShieldAlert className="w-6 h-6" />
-                    {error}
-                  </motion.div>
-                )}
-
-                <div 
-                  className="luxury-card p-1 rounded-[2rem] md:rounded-[3rem] relative group mb-6"
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
+              <div className="relative">
+                <input 
+                  type="file" 
+                  id="bill-upload" 
+                  className="hidden" 
+                  onChange={handleFileChange}
+                  accept="image/*,application/pdf"
+                />
+                <label 
+                  htmlFor="bill-upload" 
+                  className="block p-10 md:p-16 border-2 border-dashed border-slate-200 rounded-[2rem] hover:border-indigo-400 hover:bg-indigo-50/50 transition-all cursor-pointer text-center group/label"
                 >
-                  <div className={clsx(
-                    "p-6 md:p-10 border-2 border-dashed rounded-[1.8rem] md:rounded-[2.8rem] transition-all",
-                    isDragging ? "border-indigo-500 bg-indigo-500/10" : "border-border group-hover:border-indigo-500/20"
-                  )}>
-                    <input 
-                      type="file" 
-                      id="bill-upload" 
-                      className="hidden" 
-                      multiple={isBatchMode}
-                      onChange={(e) => {
-                        if (isBatchMode) {
-                          setBatchFiles(Array.from(e.target.files || []));
-                        } else {
-                          handleFileChange(e);
-                        }
-                      }} 
-                    />
-                    <label htmlFor="bill-upload" className="cursor-pointer flex flex-col md:flex-row items-center md:items-center gap-4 md:gap-8 text-center md:text-left">
-                       <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-2xl md:rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30">
-                          <UploadCloud className="w-8 h-8 md:w-10 md:h-10 text-background" />
-                       </div>
-                       <div>
-                          <p className="text-xl md:text-2xl font-black">
-                            {isBatchMode 
-                              ? (batchFiles.length > 0 ? `${batchFiles.length} Documents Selected` : "Upload Batch Directory")
-                              : (file ? file.name : "Secure Document Upload")}
-                          </p>
-                          <p className="text-[10px] font-black text-indigo-400 font-bold uppercase tracking-[0.2em] tracking-widest mt-1">
-                            {isBatchMode ? "High-Volume Parallel Processing" : "MSEDCL Audit Interface Active"}
-                          </p>
-                          <button onClick={(e) => { e.preventDefault(); loadDemo(); }} className="mt-2 mx-auto md:mx-0 text-[8px] font-black text-indigo-500/50 hover:text-indigo-500 uppercase tracking-widest transition-colors underline decoration-dotted block">Bypass for Showcase (Demo Mode)</button>
-                       </div>
-                    </label>
+                  <div className="w-20 h-20 bg-indigo-600 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-xl shadow-indigo-500/20 group-hover/label:scale-110 transition-transform">
+                    <FileText className="text-white w-10 h-10" />
                   </div>
-                </div>
-
-                <div className="flex gap-4">
-                   <button 
-                     onClick={handleExtract} 
-                     disabled={isExtracting}
-                     className="flex-1 py-4 md:py-6 rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-r from-white to-slate-100 text-black shadow-2xl gold-glow font-black text-lg md:text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-white/10 disabled:opacity-50 flex items-center justify-center gap-4 relative overflow-hidden group"
-                   >
-                     {isExtracting && <div className="absolute inset-0 bg-indigo-500/10 w-[200%] animate-scan" />}
-                     <div className="relative z-10 flex items-center gap-4">
-                        {isExtracting ? <Loader2 className="w-5 h-5 md:w-6 h-6 animate-spin text-yellow-600" /> : <Network className="w-5 h-5 md:w-6 h-6" />}
-                        <span className="text-sm md:text-xl">{isExtracting ? "NEURAL EXTRACTION ACTIVE..." : "EXECUTE TECHNICAL AUDIT"}</span>
-                     </div>
-                   </button>
-                </div>
-              </motion.div>
-
-              <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="relative mt-10 lg:mt-0">
-                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 blur-[120px] rounded-full" />
-                <div className="relative rounded-[2rem] md:rounded-[3rem] overflow-hidden border-2 border-border shadow-xl dark:shadow-2xl shadow-indigo-500/5 dark:shadow-indigo-500/10 group">
-                   <Image src="/solar-array.png" alt="Solar Analytics Array" width={800} height={800} className="relative z-10 w-full h-[300px] md:h-[600px] object-cover transition-transform duration-1000 group-hover:scale-105" />
-                   <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-20" />
-                   
-                   {isExtracting && (
-                      <div className="absolute inset-0 z-30 flex flex-col items-center justify-center">
-                         <div className="w-32 h-32 rounded-full border border-indigo-500/20 border-t-indigo-600 animate-spin mb-8" />
-                         <p className="text-indigo-600 font-mono text-sm tracking-[0.3em] uppercase animate-pulse">Processing Document...</p>
-                         <div className="absolute w-full h-[2px] bg-slate-500/50 animate-beam-move" />
-                      </div>
-                   )}
-
-                   <div className="absolute bottom-10 left-10 z-30 w-full pr-20">
-                      <div className="flex items-center gap-3 mb-4">
-                         <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse" />
-                         <span className="text-[10px] font-black uppercase tracking-widest text-emerald-500">System Status</span>
-                      </div>
-                      
-                      {isExtracting ? (
-                         <div className="space-y-2">
-                           <div className="h-1 w-full bg-muted rounded-full overflow-hidden">
-                              <div className="h-full bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 w-1/3 animate-[pulse_2s_ease-in-out_infinite]" />
-                           </div>
-                           <p className="text-[9px] font-mono text-muted-foreground">Extracting electricity bill fields...</p>
-                         </div>
-                      ) : (
-                         <h3 className="text-3xl font-black text-foreground leading-none">Audit Workspace</h3>
-                      )}
-                   </div>
-                </div>
-              </motion.div>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="lg:col-span-12 luxury-card p-6 md:p-12 rounded-[2.5rem] md:rounded-[4rem] flex flex-col md:flex-row justify-between items-center border-2 border-indigo-500/5 relative overflow-hidden group">
-                 <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 relative z-10 text-center md:text-left mb-6 md:mb-0">
-                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20">
-                       <FileCheck2 className="w-8 h-8 md:w-10 md:h-10 text-background" />
-                    </div>
-                    <div>
-                       <h2 className="text-3xl md:text-5xl font-black tracking-tight text-foreground mb-2 line-clamp-1">{extractedData.consumerName}</h2>
-                       <div className="flex flex-wrap justify-center md:justify-start gap-2 md:gap-4">
-                          <Badge label={`LOAD: ${extractedData.sanctionedLoad}kW`} />
-                          <Badge label={`MODEL: ${extractedData.aiInsights?.modelUsed || 'Gemini 1.5'}`} />
-                          <Badge label={`ESG SCORE: 94/100`} />
-                          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[8px] md:text-[9px] font-black text-emerald-500 uppercase tracking-widest">
-                             <CheckCircle2 className="w-3 h-3" />
-                             Verified Audit
-                          </div>
-                       </div>
-                    </div>
-                 </div>
-                 
-                 <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 relative z-10 w-full md:w-auto">
-                    <button onClick={() => setShowAuditTrail(!showAuditTrail)} className="w-14 h-14 md:w-20 md:h-20 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-all group relative">
-                       <Search className="w-6 h-6 md:w-8 md:h-8 text-muted-foreground group-hover:text-indigo-600" />
-                       <div className="absolute top-[-40px] whitespace-nowrap opacity-0 group-hover:opacity-100 text-[9px] font-black uppercase tracking-widest text-indigo-600 transition-opacity hidden md:block">Technical Log</div>
-                    </button>
-                    <button onClick={generateExcel} className="h-14 md:h-20 px-6 md:px-10 rounded-[1.2rem] md:rounded-[2rem] border border-indigo-500/20 text-indigo-600 font-black text-[10px] md:text-sm hover:bg-indigo-600/5 transition-all flex items-center gap-2 md:gap-3">
-                       <FileSpreadsheet className="w-4 h-4 md:w-5 h-5" /> EXCEL
-                    </button>
-                    <button className="h-14 md:h-20 px-8 md:px-12 rounded-[1.2rem] md:rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white font-black text-sm md:text-lg shadow-lg md:shadow-[0_0_40px_rgba(79,70,229,0.4)] hover:scale-[1.05] transition-all flex items-center gap-2 md:gap-3">
-                       <Download className="w-4 h-4 md:w-6 h-6" /> PDF PROPOSAL
-                    </button>
-                 </div>
-              </motion.div>
-
-              <div className="lg:col-span-3 space-y-4 md:space-y-6">
-                 <div className="luxury-card p-3 md:p-4 rounded-[2rem] md:rounded-[3rem] space-y-1 md:space-y-2 flex md:flex-col overflow-x-auto md:overflow-x-visible no-scrollbar gap-2 md:gap-0 pb-4 md:pb-0">
-                    <SideButton id="audit" label="SCHEMATIC" active={activeTab} set={setActiveTab} icon={Layers} />
-                    <SideButton id="forecast" label="PREDICTIVE" active={activeTab} set={setActiveTab} icon={TrendingUp} />
-                    <SideButton id="impact" label="ESG IMPACT" active={activeTab} set={setActiveTab} icon={Leaf} />
-                    <SideButton id="verify" label="VERIFY" active={activeTab} set={setActiveTab} icon={ShieldCheck} />
-                    <SideButton id="chat" label="EXPERT AI" active={activeTab} set={setActiveTab} icon={Bot} />
-                 </div>
-                 
-                 <div className="luxury-card p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] bg-gradient-to-br from-indigo-500/5 to-transparent">
-                    <div className="flex justify-between mb-6 md:mb-8 items-center">
-                       <IndianRupee className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" />
-                       <span className="font-handwriting text-indigo-600/60 text-base md:text-lg">Financial Modeling</span>
-                    </div>
-                    <input 
-                      type="range" min="50000" max="1000000" step="10000" value={roiInvestment} 
-                      onChange={(e) => setRoiInvestment(Number(e.target.value))}
-                      className="w-full h-1 bg-indigo-500/10 rounded-full appearance-none cursor-pointer accent-indigo-600 mb-4 md:mb-6"
-                    />
-                    <p className="text-xl md:text-2xl font-black">₹{(roiInvestment/100000).toFixed(1)}L</p>
-                    <p className="text-[10px] font-black text-indigo-400 font-bold uppercase tracking-[0.2em] tracking-widest">Investment Vector</p>
-                 </div>
+                  <p className="text-lg font-black">{file ? file.name : "Drop Electricity Bill"}</p>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-2">PDF, JPG, or PNG (Max 10MB)</p>
+                </label>
               </div>
 
-              <div className="lg:col-span-9 space-y-8">
-                 <AnimatePresence>
-                    {showAuditTrail && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="luxury-card p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] bg-slate-500/5 border border-indigo-500/10 overflow-hidden">
-                         <div className="flex items-center gap-4 mb-6">
-                            <History className="w-5 h-5 text-indigo-600" />
-                            <h3 className="text-[10px] md:text-sm font-black uppercase tracking-widest">Processing Pipeline</h3>
-                         </div>
-                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 font-mono text-[8px] md:text-[10px] opacity-80">
-                            <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-                               <p className="text-emerald-500 mb-2 font-bold">1. DOCUMENT SCAN</p>
-                               <p>Engine: OCR Core</p>
-                               <p>Confidence: 0.99</p>
-                            </div>
-                            <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-                               <p className="text-emerald-500 mb-2 font-bold">2. DATA PARSING</p>
-                               <p>Target: BU 4393</p>
-                               <p>Match: 100%</p>
-                            </div>
-                            <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
-                               <p className="text-emerald-500 mb-2 font-bold">3. CALCULATIONS</p>
-                               <p>Scaling HP to kW</p>
-                               <p>Factor: IEEE 0.746</p>
-                            </div>
-                            <div className="p-4 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 rounded-2xl border border-indigo-500/10">
-                               <p className="text-indigo-600 mb-2 font-bold">4. EXCEL GEN</p>
-                               <p>Model: Template Mapper</p>
-                               <p>Status: Active</p>
-                            </div>
-                         </div>
-                      </motion.div>
-                    )}
-                 </AnimatePresence>
+              <button 
+                onClick={executeAudit}
+                disabled={!file || isExtracting}
+                className="w-full mt-8 py-5 rounded-2xl bg-slate-900 text-white font-black text-sm uppercase tracking-[0.2em] hover:bg-indigo-600 transition-all disabled:opacity-50 disabled:hover:bg-slate-900 flex items-center justify-center gap-4"
+              >
+                {isExtracting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Analyzing Data...
+                  </>
+                ) : "Execute Technical Audit"}
+              </button>
 
-                 <AnimatePresence mode="wait">
-                    {activeTab === 'verify' && editableData && (
-                       <motion.div key="verify" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="luxury-card p-10 rounded-[3rem] h-[580px] relative overflow-hidden flex flex-col">
-                          <div className="flex items-center justify-between mb-8">
-                             <h3 className="text-xl font-black flex items-center gap-4 text-indigo-600">
-                                <ShieldCheck className="w-6 h-6" /> Audit Verification Workspace
-                             </h3>
-                             <button 
-                                onClick={() => setEditableData(JSON.parse(JSON.stringify(extractedData)))}
-                                className="text-[10px] font-black uppercase tracking-widest text-slate-500 hover:text-indigo-600 flex items-center gap-2 transition-colors"
-                             >
-                                <RefreshCcw className="w-3 h-3" /> Reset to AI Extraction
-                             </button>
-                          </div>
+              {error && (
+                <p className="mt-6 text-center text-xs font-bold text-red-500 uppercase tracking-widest">{error}</p>
+              )}
+            </div>
 
-                          <div className="flex-1 overflow-y-auto custom-scrollbar-dark pr-4 space-y-8">
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-4">
-                                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Consumer Identity</p>
-                                   <div className="space-y-3">
-                                      <div className="flex flex-col gap-1">
-                                         <label className="text-[10px] font-bold text-slate-400 ml-2">Consumer Name</label>
-                                         <input 
-                                            type="text" value={editableData.consumerName} 
-                                            onChange={(e) => setEditableData({...editableData, consumerName: e.target.value})}
-                                            className="glass-input" 
-                                         />
-                                      </div>
-                                      <div className="flex flex-col gap-1">
-                                         <label className="text-[10px] font-bold text-slate-400 ml-2">Consumer Number</label>
-                                         <input 
-                                            type="text" value={editableData.consumerNo} 
-                                            onChange={(e) => setEditableData({...editableData, consumerNo: e.target.value})}
-                                            className="glass-input" 
-                                         />
-                                      </div>
-                                   </div>
-                                </div>
-
-                                <div className="space-y-4">
-                                   <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">System Parameters</p>
-                                   <div className="space-y-3">
-                                      <div className="flex flex-col gap-1">
-                                         <div className="flex justify-between items-center px-2">
-                                            <label className="text-[10px] font-bold text-slate-400">Sanctioned Load (kW)</label>
-                                            {editableData.sanctionedLoad > 0 && (
-                                               <span className="text-[8px] font-black text-indigo-500 uppercase tracking-widest flex items-center gap-1">
-                                                  <Info className="w-2 h-2" /> HP Conversion Active
-                                               </span>
-                                            )}
-                                         </div>
-                                         <input 
-                                            type="text" value={editableData.sanctionedLoad} 
-                                            onChange={(e) => setEditableData({...editableData, sanctionedLoad: e.target.value})}
-                                            className="glass-input" 
-                                         />
-                                      </div>
-                                      <div className="flex flex-col gap-1">
-                                         <label className="text-[10px] font-bold text-slate-400 ml-2">Connection Type</label>
-                                         <input 
-                                            type="text" value={editableData.connectionType} 
-                                            onChange={(e) => setEditableData({...editableData, connectionType: e.target.value})}
-                                            className="glass-input" 
-                                         />
-                                      </div>
-                                   </div>
-                                </div>
-                             </div>
-
-                             <div className="space-y-4">
-                                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">12-Month Consumption History (Units)</p>
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                                   {editableData.billingHistory?.map((item: any, idx: number) => (
-                                      <motion.div 
-                                        key={idx}
-                                        initial={{ opacity: 0, y: 10 }} 
-                                        animate={{ opacity: 1, y: 0 }} 
-                                        transition={{ delay: idx * 0.05 }}
-                                        className="bg-background border border-border rounded-xl p-3 flex flex-col gap-1"
-                                      >
-                                         <span className="text-[9px] font-black text-slate-500 uppercase">{item.month}</span>
-                                         <input 
-                                            type="number" value={item.units} 
-                                            onChange={(e) => {
-                                               const newHistory = [...editableData.billingHistory];
-                                               newHistory[idx].units = e.target.value;
-                                               setEditableData({...editableData, billingHistory: newHistory});
-                                            }}
-                                            className="bg-transparent text-sm font-bold outline-none focus:text-indigo-400" 
-                                         />
-                                      </motion.div>
-                                   ))}
-
-                                </div>
-                             </div>
-                          </div>
-                          
-                          <div className="mt-8 pt-6 border-t border-border flex justify-between items-center">
-                             <div className="flex items-center gap-4">
-                                <div className="flex -space-x-2">
-                                   <div className="w-8 h-8 rounded-full border-2 border-background bg-emerald-500 flex items-center justify-center text-[10px] font-black text-white">AI</div>
-                                   <div className="w-8 h-8 rounded-full border-2 border-background bg-slate-700 flex items-center justify-center text-[10px] font-black text-white">HQ</div>
-                                </div>
-                                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Awaiting Verification Signature</p>
-                             </div>
-                             <button 
-                                onClick={generateExcel}
-                                className="bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 hover:scale-[1.02] hover:gold-glow text-background dark:text-black font-black uppercase tracking-widest text-xs px-8 py-4 rounded-2xl shadow-xl shadow-indigo-500/10 transition-all flex items-center gap-3"
-                             >
-                                <FileSpreadsheet className="w-4 h-4" /> Finalize Official Report
-                             </button>
-                          </div>
-                       </motion.div>
-                    )}
-
-                    {activeTab === 'verify' && !extractedData && (
-                       <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="luxury-card p-12 rounded-[4rem] h-[580px] flex flex-col items-center justify-center text-center space-y-6">
-                          <div className="w-24 h-24 bg-card border border-border rounded-[2rem] flex items-center justify-center shadow-inner">
-                             <ClipboardList className="w-12 h-12 text-slate-300 dark:text-slate-700" />
-                          </div>
-                          <div>
-                             <h3 className="text-xl font-black mb-2 text-foreground">Audit Workspace Empty</h3>
-                             <p className="text-sm text-muted-foreground max-w-xs mx-auto">Upload an electricity bill to initialize the AI extraction and verification sequence.</p>
-                          </div>
-                       </motion.div>
-                    )}
-
-{activeTab === 'chat' && (
-                       <motion.div key="chat" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="luxury-card p-8 rounded-[4rem] h-[550px] flex flex-col">
-                          <div className="flex items-center gap-4 mb-6 px-4">
-                             <Bot className="w-6 h-6 text-indigo-600" />
-                             <div>
-                               <h3 className="text-xl font-black">EnergyBae Assistant</h3>
-                               <p className="text-[10px] font-black uppercase tracking-widest text-emerald-500">Online</p>
-                             </div>
-                          </div>
-                          
-                          <div className="flex-1 overflow-y-auto space-y-6 px-4 pb-4">
-                             {chatHistory.map((msg, i) => (
-                               <div key={i} className={clsx("flex flex-col max-w-[80%]", msg.role === 'user' ? "ml-auto items-end" : "items-start")}>
-                                  <div className={clsx("p-6 rounded-[2rem] text-sm leading-relaxed shadow-lg", msg.role === 'user' ? "bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-background dark:text-black font-medium rounded-tr-sm" : "bg-card border border-border rounded-tl-sm")}>
-                                    {msg.text}
-                                  </div>
-                                  <span className="text-[10px] font-black uppercase tracking-widest text-slate-600 mt-2">
-                                    {msg.role === 'user' ? 'Auditor' : 'System'}
-                                  </span>
-                               </div>
-                             ))}
-                             <div ref={chatEndRef} />
-                             <div className="mt-4 flex gap-2 md:gap-4">
-                              <input 
-                                type="text" 
-                                value={chatMessage}
-                                onChange={(e) => setChatMessage(e.target.value)}
-                                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                                placeholder="Ask questions..."
-                                className="flex-1 bg-card border border-border rounded-[1.5rem] md:rounded-[2rem] px-4 md:px-8 py-3 md:py-4 text-sm outline-none focus:border-slate-500/50 transition-colors"
-                              />
-                              <button onClick={handleSendMessage} className="w-12 h-12 md:w-16 md:h-16 rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-background dark:text-black shrink-0">
-                                <Send className="w-5 h-5 md:w-6 md:h-6" />
-                              </button>
-                           </div>
-                          </div>
-                       </motion.div>
-                    )}
-
-                    {activeTab === 'impact' && (
-                       <motion.div key="impact" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 h-[550px] overflow-y-auto custom-scrollbar-dark pr-2 md:pr-4">
-                          <div className="luxury-card p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] bg-gradient-to-br from-emerald-500/5 to-transparent border border-emerald-500/10 col-span-1 md:col-span-2">
-                             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
-                                <div className="flex items-center gap-4">
-                                   <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-emerald-500/10 flex items-center justify-center shrink-0">
-                                      <TrendingUp className="w-5 h-5 md:w-6 md:h-6 text-emerald-500" />
-                                   </div>
-                                   <div>
-                                      <h4 className="text-lg md:text-xl font-black">25-Year Wealth</h4>
-                                      <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-slate-500">Compounding Savings (5% utility inflation)</p>
-                                   </div>
-                                </div>
-                                <div className="text-left md:text-right w-full md:w-auto border-t md:border-t-0 border-emerald-500/10 pt-4 md:pt-0">
-                                   <p className="text-xl md:text-2xl font-black text-emerald-500">₹{(Number(avgUnits) * 12 * 7.5 * 25 / 100000).toFixed(1)}L+</p>
-                                   <p className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-500">Projected Lifetime Value</p>
-                                </div>
-                             </div>
-                             <SavingsChart yearlySavings={Math.round(avgUnits * 12 * 7.5)} />
-                          </div>
-
-                          <div className="luxury-card p-8 md:p-10 rounded-[2.5rem] md:rounded-[4rem] flex flex-col justify-center items-center text-center">
-                             <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-emerald-500/10 flex items-center justify-center mb-6">
-                                <TreeDeciduous className="w-8 h-8 md:w-10 md:h-10 text-emerald-500" />
-                             </div>
-                             <h4 className="text-5xl md:text-6xl font-black text-emerald-500 tracking-tight">{treesSaved}</h4>
-                             <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">Trees Saved / Year</p>
-                          </div>
-                          <div className="luxury-card p-8 md:p-10 rounded-[2.5rem] md:rounded-[4rem] flex flex-col justify-center items-center text-center">
-                             <div className="w-16 h-16 md:w-20 md:h-20 rounded-full bg-blue-500/10 flex items-center justify-center mb-6">
-                                <Globe className="w-8 h-8 md:w-10 md:h-10 text-blue-500" />
-                             </div>
-                             <h4 className="text-5xl md:text-6xl font-black text-blue-500 tracking-tight">{carbonSaved}</h4>
-                             <p className="text-[8px] md:text-[10px] font-black uppercase tracking-widest text-muted-foreground">KG CO2 Offset / Year</p>
-                          </div>
-                          
-                          <div className="luxury-card p-8 md:p-10 rounded-[2rem] md:rounded-[3rem] col-span-1 md:col-span-2 bg-indigo-600/5 border border-indigo-500/10">
-                             <div className="flex justify-between items-center mb-6">
-                                <h4 className="text-base md:text-lg font-black flex items-center gap-3">
-                                   <ShieldCheck className="w-5 h-5 text-indigo-600" /> Payback Velocity
-                                </h4>
-                                <span className="text-xs md:text-sm font-black text-indigo-600">{breakEvenYears} Years</span>
-                             </div>
-                             <div className="h-4 w-full bg-muted rounded-full overflow-hidden p-1">
-                                <motion.div 
-                                   initial={{ width: 0 }}
-                                   animate={{ width: `${Math.min(100, (1 / Number(breakEvenYears)) * 100)}%` }}
-                                   transition={{ duration: 2, ease: "easeOut" }}
-                                   className="h-full bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full"
-                                />
-                             </div>
-                             <p className="text-[8px] md:text-[9px] font-black uppercase tracking-widest text-slate-500 mt-4 text-center">Calculated break-even based on current ₹{roiInvestment.toLocaleString()} investment vector</p>
-                          </div>
-                       </motion.div>
-                    )}
-
-                    {activeTab === 'audit' && (
-                      <motion.div key="audit" initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} className="luxury-card p-12 rounded-[4rem] h-[550px] relative">
-                         <div className="flex justify-between items-center mb-10">
-                            <h3 className="text-2xl font-black flex items-center gap-4">
-                               <BarChart3 className="w-6 h-6 text-indigo-600" /> Historical Consumption Profile
-                            </h3>
-                         </div>
-                         <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={forecastData}>
-                              <XAxis dataKey="month" stroke="#64748b33" fontSize={10} fontWeight={900} />
-                              <Tooltip cursor={{fill: '#ffffff05'}} contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '24px', border: '1px solid rgba(79,70,229,0.1)' }} />
-                              <Bar dataKey="units" radius={[10, 10, 0, 0]}>
-                                {forecastData.map((entry, index) => (
-                                  <Cell key={index} fill={entry.isAnomaly ? '#ef4444' : '#4f46e5'} fillOpacity={entry.isAnomaly ? 0.8 : 0.3} stroke={entry.isAnomaly ? '#ef4444' : '#4f46e5'} strokeWidth={2} />
-                                ))}
-                              </Bar>
-                            </BarChart>
-                         </ResponsiveContainer>
-                      </motion.div>
-                    )}
-
-                    {activeTab === 'verify' && (
-                       <motion.div key="verify" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="luxury-card p-6 md:p-12 rounded-[2.5rem] md:rounded-[4rem] h-auto lg:h-[550px] overflow-y-auto custom-scrollbar-dark">
-                          <div className="flex justify-between items-center mb-8 md:mb-10">
-                             <h3 className="text-xl md:text-2xl font-black flex items-center gap-3 md:gap-4">
-                                <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" /> Neural Extract Audit
-                             </h3>
-                             <button onClick={() => setExtractedData(editableData)} className="px-4 md:px-6 py-2 rounded-xl bg-indigo-600 text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all">Update Workspace</button>
-                          </div>
-                          
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-                             <EditField label="Consumer Name" value={editableData?.consumerName} onChange={(v:any) => setEditableData({...editableData, consumerName: v})} />
-                             <EditField label="Consumer Number" value={editableData?.consumerNo} onChange={(v:any) => setEditableData({...editableData, consumerNo: v})} />
-                             <EditField label="Fixed Charges" value={editableData?.fixedCharges} onChange={(v:any) => setEditableData({...editableData, fixedCharges: v})} />
-                             <EditField label="Sanctioned Load" value={editableData?.sanctionedLoad} onChange={(v:any) => setEditableData({...editableData, sanctionedLoad: v})} />
-                             <EditField label="Connection Type" value={editableData?.connectionType} onChange={(v:any) => setEditableData({...editableData, connectionType: v})} />
-                             <EditField label="Current Bill" value={editableData?.billAmount} onChange={(v:any) => setEditableData({...editableData, billAmount: v})} />
-                          </div>            
-                       </motion.div>
-                    )}
-
-                    {activeTab === 'forecast' && (
-                       <motion.div key="forecast" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="luxury-card p-12 rounded-[4rem] h-[550px] relative">
-                          <div className="flex justify-between items-center mb-10">
-                             <h3 className="text-2xl font-black flex items-center gap-4">
-                                <TrendingUp className="w-6 h-6 text-indigo-600" /> Predictive Projections
-                             </h3>
-                          </div>
-                          <ResponsiveContainer width="100%" height="100%">
-                             <AreaChart data={forecastData}>
-                               <XAxis dataKey="month" stroke="#64748b33" fontSize={10} fontWeight={900} />
-                               <Tooltip contentStyle={{ backgroundColor: 'var(--card)', borderRadius: '24px', border: '1px solid rgba(79,70,229,0.1)' }} />
-                               <Area type="monotone" dataKey="units" stroke="#64748b" strokeWidth={2} fill="transparent" strokeDasharray="5 5" name="Historical" />
-                               <Area type="monotone" dataKey="predicted" stroke="#4f46e5" strokeWidth={4} fill="transparent" name="AI Projection" animationDuration={2500} />
-                             </AreaChart>
-                          </ResponsiveContainer>
-                       </motion.div>
-                    )}
-                 </AnimatePresence>
-
-                 <div className="mt-6 md:mt-10 p-6 md:p-10 bg-background border border-border rounded-[2rem] md:rounded-[3rem] shadow-2xl relative overflow-hidden group">
-                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-500/50 to-transparent animate-beam-move" />
-                     <div className="flex justify-between items-center mb-4 md:mb-6">
-                        <div className="flex items-center gap-2 md:gap-3">
-                           <Cpu className="w-3 h-3 md:w-4 md:h-4 text-indigo-600" />
-                           <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-slate-600">AI Intelligence Stream</span>
-                        </div>
-                        <Activity className="w-3 h-3 md:w-4 md:h-4 text-indigo-600 animate-pulse" />
-                     </div>
-                     <div className="font-mono text-[8px] md:text-[10px] leading-relaxed h-16 md:h-20 overflow-y-auto opacity-40 custom-scrollbar-dark">
-                        {agentThoughts.map((t, i) => <div key={i}>[{new Date().toLocaleTimeString()}] [{t.type.toUpperCase()}] {t.message}</div>)}
-                        <div ref={terminalEndRef} />
-                     </div>
-                  </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-200">
+                <Smartphone className="w-6 h-6 text-indigo-600 mb-4" />
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Mobile Optimized</p>
+                <p className="text-sm font-black">Field Ready</p>
+              </div>
+              <div className="bg-white p-6 rounded-[2rem] border border-slate-200">
+                <ShieldCheck className="w-6 h-6 text-indigo-600 mb-4" />
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Bank Grade</p>
+                <p className="text-sm font-black">Secure Audit</p>
               </div>
             </div>
-          )}
-        </AnimatePresence>
+          </div>
+
+          {/* RIGHT: RESULTS */}
+          <div className="lg:col-span-7">
+            <AnimatePresence mode="wait">
+              {data ? (
+                <motion.div 
+                  initial={{ opacity: 0, x: 20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="space-y-6"
+                >
+                  <div className="bg-white p-8 md:p-12 rounded-[3rem] border border-slate-200 shadow-2xl shadow-indigo-500/5">
+                    <div className="flex justify-between items-start mb-10">
+                      <div>
+                        <h3 className="text-3xl md:text-4xl font-black tracking-tight">{data.consumerName}</h3>
+                        <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mt-2">Consumer No: {data.consumerNo}</p>
+                      </div>
+                      <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-50 text-emerald-600 text-[10px] font-black uppercase tracking-widest border border-emerald-100">
+                        <CheckCircle2 className="w-4 h-4" />
+                        Validated
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12">
+                      <ResultStat label="Avg Monthly Units" value={`${avgUnits}`} sub="kWh" />
+                      <ResultStat label="Sanctioned Load" value={`${data.sanctionedLoad}`} sub="kW" />
+                      <ResultStat label="Solar Required" value={`${solarKw}`} sub="kW" />
+                      <ResultStat label="Total Panels" value={`${panels}`} sub="Nos" />
+                    </div>
+
+                    <div className="bg-indigo-50/50 p-8 rounded-[2rem] border border-indigo-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                      <div className="text-center md:text-left">
+                        <p className="text-[10px] font-black text-indigo-600 uppercase tracking-widest mb-1">Est. Govt Subsidy</p>
+                        <p className="text-3xl font-black text-indigo-900">₹{subsidy.toLocaleString('en-IN')}</p>
+                        <p className="text-[9px] font-medium text-indigo-400 mt-1">PM-Surya Ghar Yojana</p>
+                      </div>
+                      <button 
+                        onClick={downloadExcel}
+                        className="px-10 py-5 rounded-2xl bg-white border border-indigo-200 text-indigo-600 font-black text-xs uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all flex items-center gap-3 shadow-sm"
+                      >
+                        <FileSpreadsheet className="w-5 h-5" /> Export Professional Report
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 flex items-center gap-6">
+                      <div className="w-16 h-16 bg-emerald-50 rounded-2xl flex items-center justify-center">
+                        <Leaf className="w-8 h-8 text-emerald-600" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-black">{Math.round(avgUnits * 12 * 0.82)}kg</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">CO2 Offset / Year</p>
+                      </div>
+                    </div>
+                    <div className="bg-white p-8 rounded-[2.5rem] border border-slate-200 flex items-center gap-6">
+                      <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center">
+                        <TrendingUp className="w-8 h-8 text-blue-600" />
+                      </div>
+                      <div>
+                        <p className="text-2xl font-black">₹{Math.round(avgUnits * 12 * 8.5 * 25 / 100000)}L</p>
+                        <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">25yr Wealth Gain</p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <div className="bg-white p-12 md:p-20 rounded-[4rem] border border-slate-200 border-dashed flex flex-col items-center justify-center text-center space-y-8 h-full min-h-[500px]">
+                  <div className="w-32 h-32 bg-slate-50 rounded-[3rem] flex items-center justify-center">
+                    <Info className="w-12 h-12 text-slate-200" />
+                  </div>
+                  <div>
+                    <h3 className="text-2xl font-black mb-4">Audit Results Pending</h3>
+                    <p className="text-slate-400 max-w-sm mx-auto text-sm leading-relaxed">
+                      Please upload an electricity bill in the panel to the left. Our AI will analyze the usage and generate your solar roadmap.
+                    </p>
+                  </div>
+                </div>
+              )}
+            </AnimatePresence>
+          </div>
+        </div>
       </main>
 
-      <footer className="relative z-50 p-6 md:p-12 flex flex-col md:flex-row justify-between items-center gap-4 opacity-30 text-[8px] md:text-[10px] font-black uppercase tracking-widest text-center md:text-left">
-         <div className="flex items-center gap-3">
-            <Lock className="w-3 h-3 text-emerald-500" />
-            <span>Prototype V16.0 — Secured</span>
-         </div>
-         <div className="flex flex-col md:flex-row gap-4 md:gap-10">
-            <span>Orchestration: Gemini 1.5 Flash</span>
-            <span>EnergyBae Technical Suite</span>
-         </div>
+      <footer className="max-w-6xl mx-auto px-6 py-20 border-t border-slate-200 text-center">
+        <div className="flex justify-center gap-12 mb-12 opacity-30">
+          <Zap className="w-8 h-8" />
+          <BrainCircuit className="w-8 h-8" />
+          <Leaf className="w-8 h-8" />
+        </div>
+        <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">EnergyBae Intel Engine v2.0</p>
       </footer>
     </div>
   );
 }
 
-function NavInfo({ label, value }: { label: string, value: string }) {
+function ResultStat({ label, value, sub }: { label: string, value: string, sub: string }) {
   return (
-    <div className="text-right">
-       <p className="text-[9px] font-black text-indigo-400 font-bold uppercase tracking-[0.2em] tracking-widest leading-none mb-1">{label}</p>
-       <p className="text-[11px] font-black text-foreground uppercase leading-none">{value}</p>
-    </div>
-  );
-}
-
-function Badge({ label }: { label: string }) {
-  return <div className="px-3 py-1 rounded-lg bg-card border border-border text-[9px] font-black text-muted-foreground uppercase tracking-widest">{label}</div>;
-}
-
-function SideButton({ id, label, active, set, icon: Icon }: any) {
-  return (
-    <button onClick={() => set(id)} className={clsx(
-      "flex-1 md:w-full flex flex-col md:flex-row items-center gap-2 md:gap-4 px-4 md:px-8 py-3 md:py-6 rounded-xl md:rounded-[2rem] transition-all duration-500 shrink-0",
-      active === id ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg" : "hover:bg-white/5 text-muted-foreground"
-    )}>
-       <Icon className="w-4 h-4 md:w-5 md:h-5" />
-       <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest whitespace-nowrap">{label}</span>
-    </button>
-  );
-}
-function EditField({ label, value, onChange }: any) {
-  return (
-    <div className="space-y-2">
-       <p className="text-[9px] md:text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-4">{label}</p>
-       <input 
-         type="text" 
-         value={value || ''} 
-         onChange={(e) => onChange(e.target.value)}
-         className="w-full bg-background border border-border rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 text-sm md:text-base outline-none focus:border-indigo-500/50 transition-colors font-medium"
-       />
+    <div className="space-y-1">
+      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">{label}</p>
+      <div className="flex items-baseline gap-1">
+        <p className="text-2xl md:text-3xl font-black">{value}</p>
+        <span className="text-[10px] font-black text-slate-400 uppercase">{sub}</span>
+      </div>
     </div>
   );
 }
