@@ -361,19 +361,19 @@ Return ONLY valid JSON, no markdown:
         </svg>
       </div>
 
-      <nav className="relative z-50 px-12 py-10 flex justify-between items-center">
-        <div className="flex items-center gap-4 group cursor-pointer" onClick={() => window.location.reload()}>
-          <div className="w-14 h-14 bg-gradient-to-tr from-indigo-600 to-indigo-700 rounded-[1.5rem] flex items-center justify-center shadow-xl dark:shadow-2xl shadow-indigo-500/5 dark:shadow-indigo-500/10 group-hover:scale-105 transition-transform">
-            <Zap className="text-background w-8 h-8 fill-current" />
+      <nav className="relative z-50 px-6 md:px-12 py-6 md:py-10 flex justify-between items-center">
+        <div className="flex items-center gap-3 md:gap-4 group cursor-pointer" onClick={() => window.location.reload()}>
+          <div className="w-10 h-10 md:w-14 md:h-14 bg-gradient-to-tr from-indigo-600 to-indigo-700 rounded-[1rem] md:rounded-[1.5rem] flex items-center justify-center shadow-xl dark:shadow-2xl shadow-indigo-500/5 dark:shadow-indigo-500/10 group-hover:scale-105 transition-transform">
+            <Zap className="text-background w-6 h-6 md:w-8 md:h-8 fill-current" />
           </div>
           <div>
-            <h1 className="text-3xl font-black tracking-tight uppercase leading-none text-foreground">EnergyBae</h1>
-            <p className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em] mt-1">Solar Audit Automation Tool</p>
+            <h1 className="text-xl md:text-3xl font-black tracking-tight uppercase leading-none text-foreground">EnergyBae</h1>
+            <p className="text-[8px] md:text-[10px] font-black text-indigo-600 uppercase tracking-[0.4em] mt-1">Solar Audit Automation</p>
           </div>
         </div>
         <ThemeToggle />
 
-        <div className="flex items-center gap-10">
+        <div className="hidden md:flex items-center gap-10">
           <NavInfo label="Model Status" value="Online / 14ms" />
           <div className="w-12 h-12 rounded-full border border-border flex items-center justify-center bg-card relative group cursor-pointer">
              <Bot className="w-6 h-6 text-muted-foreground group-hover:text-indigo-600 transition-colors" />
@@ -382,7 +382,7 @@ Return ONLY valid JSON, no markdown:
         </div>
       </nav>
 
-      <main className="relative z-10 max-w-[1600px] mx-auto px-12 py-10">
+      <main className="relative z-10 max-w-[1600px] mx-auto px-4 md:px-12 py-4 md:py-10">
         <AnimatePresence mode="wait">
           {!extractedData ? (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 items-center min-h-[70vh]">
@@ -391,11 +391,11 @@ Return ONLY valid JSON, no markdown:
                    <BrainCircuit className="w-4 h-4 text-indigo-600 animate-pulse" />
                    <span className="text-[10px] font-black uppercase tracking-widest text-indigo-600">Gemini-Powered Intelligence</span>
                 </div>
-                <h2 className="text-8xl font-black tracking-tight leading-[0.8] mb-12">
-                   Strategic <br/>
+                <h2 className="text-5xl md:text-8xl font-black tracking-tight leading-[0.9] md:leading-[0.8] mb-8 md:mb-12">
+                   Strategic <br className="hidden md:block" />
                    <span className="text-foreground bg-gradient-to-r from-indigo-500 via-indigo-600 to-blue-600">Forecasting.</span>
                 </h2>
-                <p className="text-xl text-muted-foreground font-medium max-w-xl leading-relaxed mb-12">
+                <p className="text-lg md:text-xl text-muted-foreground font-medium max-w-xl leading-relaxed mb-8 md:mb-12">
                    Professional energy intelligence for the Maharashtra region. RAG-grounded multi-modal inference with Gemini 1.5 Flash.
                 </p>
                 
@@ -424,13 +424,13 @@ Return ONLY valid JSON, no markdown:
                 )}
 
                 <div 
-                  className="luxury-card p-1 rounded-[3rem] relative group mb-6"
+                  className="luxury-card p-1 rounded-[2rem] md:rounded-[3rem] relative group mb-6"
                   onDragOver={handleDragOver}
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
                   <div className={clsx(
-                    "p-10 border-2 border-dashed rounded-[2.8rem] transition-all",
+                    "p-6 md:p-10 border-2 border-dashed rounded-[1.8rem] md:rounded-[2.8rem] transition-all",
                     isDragging ? "border-indigo-500 bg-indigo-500/10" : "border-border group-hover:border-indigo-500/20"
                   )}>
                     <input 
@@ -446,20 +446,20 @@ Return ONLY valid JSON, no markdown:
                         }
                       }} 
                     />
-                    <label htmlFor="bill-upload" className="cursor-pointer flex items-center gap-8">
-                       <div className="w-20 h-20 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30">
-                          <UploadCloud className="w-10 h-10 text-background" />
+                    <label htmlFor="bill-upload" className="cursor-pointer flex flex-col md:flex-row items-center md:items-center gap-4 md:gap-8 text-center md:text-left">
+                       <div className="w-16 h-16 md:w-20 md:h-20 bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 rounded-2xl md:rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30">
+                          <UploadCloud className="w-8 h-8 md:w-10 md:h-10 text-background" />
                        </div>
                        <div>
-                          <p className="text-2xl font-black">
+                          <p className="text-xl md:text-2xl font-black">
                             {isBatchMode 
                               ? (batchFiles.length > 0 ? `${batchFiles.length} Documents Selected` : "Upload Batch Directory")
                               : (file ? file.name : "Secure Document Upload")}
                           </p>
-                          <p className="text-[10px] font-black text-indigo-400 font-bold uppercase tracking-[0.2em] tracking-widest">
-                           <button onClick={(e) => { e.preventDefault(); loadDemo(); }} className="mt-2 text-[8px] font-black text-indigo-500/50 hover:text-indigo-500 uppercase tracking-widest transition-colors underline decoration-dotted block">Bypass for Showcase (Demo Mode)</button>
+                          <p className="text-[10px] font-black text-indigo-400 font-bold uppercase tracking-[0.2em] tracking-widest mt-1">
                             {isBatchMode ? "High-Volume Parallel Processing" : "MSEDCL Audit Interface Active"}
                           </p>
+                          <button onClick={(e) => { e.preventDefault(); loadDemo(); }} className="mt-2 mx-auto md:mx-0 text-[8px] font-black text-indigo-500/50 hover:text-indigo-500 uppercase tracking-widest transition-colors underline decoration-dotted block">Bypass for Showcase (Demo Mode)</button>
                        </div>
                     </label>
                   </div>
@@ -469,12 +469,12 @@ Return ONLY valid JSON, no markdown:
                    <button 
                      onClick={handleExtract} 
                      disabled={isExtracting}
-                     className="flex-1 py-6 rounded-[2rem] bg-gradient-to-r from-white to-slate-100 text-black shadow-2xl gold-glow font-black text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-white/10 disabled:opacity-50 flex items-center justify-center gap-4 relative overflow-hidden group"
+                     className="flex-1 py-4 md:py-6 rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-r from-white to-slate-100 text-black shadow-2xl gold-glow font-black text-lg md:text-xl hover:scale-[1.02] active:scale-95 transition-all shadow-2xl shadow-white/10 disabled:opacity-50 flex items-center justify-center gap-4 relative overflow-hidden group"
                    >
                      {isExtracting && <div className="absolute inset-0 bg-indigo-500/10 w-[200%] animate-scan" />}
                      <div className="relative z-10 flex items-center gap-4">
-                        {isExtracting ? <Loader2 className="w-6 h-6 animate-spin text-yellow-600" /> : <Network className="w-6 h-6" />}
-                        {isExtracting ? "NEURAL EXTRACTION ACTIVE..." : "EXECUTE TECHNICAL AUDIT"}
+                        {isExtracting ? <Loader2 className="w-5 h-5 md:w-6 h-6 animate-spin text-yellow-600" /> : <Network className="w-5 h-5 md:w-6 h-6" />}
+                        <span className="text-sm md:text-xl">{isExtracting ? "NEURAL EXTRACTION ACTIVE..." : "EXECUTE TECHNICAL AUDIT"}</span>
                      </div>
                    </button>
                 </div>
@@ -482,8 +482,8 @@ Return ONLY valid JSON, no markdown:
 
               <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="relative mt-10 lg:mt-0">
                 <div className="absolute inset-0 bg-gradient-to-br from-indigo-500/10 to-purple-500/5 blur-[120px] rounded-full" />
-                <div className="relative rounded-[3rem] overflow-hidden border-2 border-border shadow-xl dark:shadow-2xl shadow-indigo-500/5 dark:shadow-indigo-500/10 group">
-                   <Image src="/solar-array.png" alt="Solar Analytics Array" width={800} height={800} className="relative z-10 w-full h-[600px] object-cover transition-transform duration-1000 group-hover:scale-105" />
+                <div className="relative rounded-[2rem] md:rounded-[3rem] overflow-hidden border-2 border-border shadow-xl dark:shadow-2xl shadow-indigo-500/5 dark:shadow-indigo-500/10 group">
+                   <Image src="/solar-array.png" alt="Solar Analytics Array" width={800} height={800} className="relative z-10 w-full h-[300px] md:h-[600px] object-cover transition-transform duration-1000 group-hover:scale-105" />
                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent z-20" />
                    
                    {isExtracting && (
@@ -516,59 +516,59 @@ Return ONLY valid JSON, no markdown:
             </div>
           ) : (
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="lg:col-span-12 luxury-card p-12 rounded-[4rem] flex flex-col md:flex-row justify-between items-center border-2 border-indigo-500/5 relative overflow-hidden group">
-                 <div className="flex items-center gap-8 relative z-10">
-                    <div className="w-24 h-24 rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20">
-                       <FileCheck2 className="w-10 h-10 text-background" />
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="lg:col-span-12 luxury-card p-6 md:p-12 rounded-[2.5rem] md:rounded-[4rem] flex flex-col md:flex-row justify-between items-center border-2 border-indigo-500/5 relative overflow-hidden group">
+                 <div className="flex flex-col md:flex-row items-center gap-4 md:gap-8 relative z-10 text-center md:text-left mb-6 md:mb-0">
+                    <div className="w-20 h-20 md:w-24 md:h-24 rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center shadow-2xl shadow-indigo-500/20">
+                       <FileCheck2 className="w-8 h-8 md:w-10 md:h-10 text-background" />
                     </div>
                     <div>
-                       <h2 className="text-5xl font-black tracking-tight text-foreground mb-2">{extractedData.consumerName}</h2>
-                       <div className="flex gap-4">
+                       <h2 className="text-3xl md:text-5xl font-black tracking-tight text-foreground mb-2 line-clamp-1">{extractedData.consumerName}</h2>
+                       <div className="flex flex-wrap justify-center md:justify-start gap-2 md:gap-4">
                           <Badge label={`LOAD: ${extractedData.sanctionedLoad}kW`} />
                           <Badge label={`MODEL: ${extractedData.aiInsights?.modelUsed || 'Gemini 1.5'}`} />
                           <Badge label={`ESG SCORE: 94/100`} />
-                          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[9px] font-black text-emerald-500 uppercase tracking-widest">
+                          <div className="flex items-center gap-2 px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[8px] md:text-[9px] font-black text-emerald-500 uppercase tracking-widest">
                              <CheckCircle2 className="w-3 h-3" />
-                             Verified Audit Logic
+                             Verified Audit
                           </div>
                        </div>
                     </div>
                  </div>
                  
-                 <div className="flex items-center gap-6 relative z-10">
-                    <button onClick={() => setShowAuditTrail(!showAuditTrail)} className="w-20 h-20 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-all group relative">
-                       <Search className="w-8 h-8 text-muted-foreground group-hover:text-indigo-600" />
-                       <div className="absolute top-[-40px] whitespace-nowrap opacity-0 group-hover:opacity-100 text-[9px] font-black uppercase tracking-widest text-indigo-600 transition-opacity">Technical Log</div>
+                 <div className="flex flex-wrap justify-center items-center gap-3 md:gap-6 relative z-10 w-full md:w-auto">
+                    <button onClick={() => setShowAuditTrail(!showAuditTrail)} className="w-14 h-14 md:w-20 md:h-20 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-all group relative">
+                       <Search className="w-6 h-6 md:w-8 md:h-8 text-muted-foreground group-hover:text-indigo-600" />
+                       <div className="absolute top-[-40px] whitespace-nowrap opacity-0 group-hover:opacity-100 text-[9px] font-black uppercase tracking-widest text-indigo-600 transition-opacity hidden md:block">Technical Log</div>
                     </button>
-                    <button onClick={generateExcel} className="h-20 px-10 rounded-[2rem] border border-indigo-500/20 text-indigo-600 font-black text-sm hover:bg-indigo-600/5 transition-all flex items-center gap-3">
-                       <FileSpreadsheet className="w-5 h-5" /> EXCEL
+                    <button onClick={generateExcel} className="h-14 md:h-20 px-6 md:px-10 rounded-[1.2rem] md:rounded-[2rem] border border-indigo-500/20 text-indigo-600 font-black text-[10px] md:text-sm hover:bg-indigo-600/5 transition-all flex items-center gap-2 md:gap-3">
+                       <FileSpreadsheet className="w-4 h-4 md:w-5 h-5" /> EXCEL
                     </button>
-                    <button className="h-20 px-12 rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white font-black text-lg shadow-[0_0_40px_rgba(79,70,229,0.4)] hover:scale-[1.05] transition-all flex items-center gap-3">
-                       <Download className="w-6 h-6" /> GENERATE PDF PROPOSAL
+                    <button className="h-14 md:h-20 px-8 md:px-12 rounded-[1.2rem] md:rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 text-white font-black text-sm md:text-lg shadow-lg md:shadow-[0_0_40px_rgba(79,70,229,0.4)] hover:scale-[1.05] transition-all flex items-center gap-2 md:gap-3">
+                       <Download className="w-4 h-4 md:w-6 h-6" /> PDF PROPOSAL
                     </button>
                  </div>
               </motion.div>
 
-              <div className="lg:col-span-3 space-y-6">
-                 <div className="luxury-card p-4 rounded-[3rem] space-y-2">
-                    <SideButton id="audit" label="LOAD SCHEMATIC" active={activeTab} set={setActiveTab} icon={Layers} />
-                    <SideButton id="forecast" label="PREDICTIVE AI" active={activeTab} set={setActiveTab} icon={TrendingUp} />
+              <div className="lg:col-span-3 space-y-4 md:space-y-6">
+                 <div className="luxury-card p-3 md:p-4 rounded-[2rem] md:rounded-[3rem] space-y-1 md:space-y-2 flex md:flex-col overflow-x-auto md:overflow-x-visible no-scrollbar gap-2 md:gap-0 pb-4 md:pb-0">
+                    <SideButton id="audit" label="SCHEMATIC" active={activeTab} set={setActiveTab} icon={Layers} />
+                    <SideButton id="forecast" label="PREDICTIVE" active={activeTab} set={setActiveTab} icon={TrendingUp} />
                     <SideButton id="impact" label="ESG IMPACT" active={activeTab} set={setActiveTab} icon={Leaf} />
-                    <SideButton id="verify" label="VERIFY DATA" active={activeTab} set={setActiveTab} icon={ShieldCheck} />
-                    <SideButton id="chat" label="ENGINEER GPT" active={activeTab} set={setActiveTab} icon={Bot} />
+                    <SideButton id="verify" label="VERIFY" active={activeTab} set={setActiveTab} icon={ShieldCheck} />
+                    <SideButton id="chat" label="EXPERT AI" active={activeTab} set={setActiveTab} icon={Bot} />
                  </div>
                  
-                 <div className="luxury-card p-10 rounded-[3rem] bg-gradient-to-br from-indigo-500/5 to-transparent">
-                    <div className="flex justify-between mb-8 items-center">
-                       <IndianRupee className="w-6 h-6 text-indigo-600" />
-                       <span className="font-handwriting text-indigo-600/60 text-lg">Financial Modeling</span>
+                 <div className="luxury-card p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] bg-gradient-to-br from-indigo-500/5 to-transparent">
+                    <div className="flex justify-between mb-6 md:mb-8 items-center">
+                       <IndianRupee className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" />
+                       <span className="font-handwriting text-indigo-600/60 text-base md:text-lg">Financial Modeling</span>
                     </div>
                     <input 
                       type="range" min="50000" max="1000000" step="10000" value={roiInvestment} 
                       onChange={(e) => setRoiInvestment(Number(e.target.value))}
-                      className="w-full h-1 bg-indigo-500/10 rounded-full appearance-none cursor-pointer accent-indigo-600 mb-6"
+                      className="w-full h-1 bg-indigo-500/10 rounded-full appearance-none cursor-pointer accent-indigo-600 mb-4 md:mb-6"
                     />
-                    <p className="text-2xl font-black">₹{(roiInvestment/100000).toFixed(1)}L</p>
+                    <p className="text-xl md:text-2xl font-black">₹{(roiInvestment/100000).toFixed(1)}L</p>
                     <p className="text-[10px] font-black text-indigo-400 font-bold uppercase tracking-[0.2em] tracking-widest">Investment Vector</p>
                  </div>
               </div>
@@ -576,12 +576,12 @@ Return ONLY valid JSON, no markdown:
               <div className="lg:col-span-9 space-y-8">
                  <AnimatePresence>
                     {showAuditTrail && (
-                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="luxury-card p-10 rounded-[3rem] bg-slate-500/5 border border-indigo-500/10 overflow-hidden">
+                      <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="luxury-card p-6 md:p-10 rounded-[2rem] md:rounded-[3rem] bg-slate-500/5 border border-indigo-500/10 overflow-hidden">
                          <div className="flex items-center gap-4 mb-6">
                             <History className="w-5 h-5 text-indigo-600" />
-                            <h3 className="text-sm font-black uppercase tracking-widest">Processing Pipeline</h3>
+                            <h3 className="text-[10px] md:text-sm font-black uppercase tracking-widest">Processing Pipeline</h3>
                          </div>
-                         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 font-mono text-[10px] opacity-80">
+                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 font-mono text-[8px] md:text-[10px] opacity-80">
                             <div className="p-4 bg-emerald-500/10 rounded-2xl border border-emerald-500/20">
                                <p className="text-emerald-500 mb-2 font-bold">1. DOCUMENT SCAN</p>
                                <p>Engine: OCR Core</p>
@@ -756,20 +756,19 @@ Return ONLY valid JSON, no markdown:
                                </div>
                              ))}
                              <div ref={chatEndRef} />
-                          </div>
-
-                          <div className="mt-4 flex gap-4">
-                             <input 
-                               type="text" 
-                               value={chatMessage}
-                               onChange={(e) => setChatMessage(e.target.value)}
-                               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                               placeholder="Ask questions about the audit..."
-                               className="flex-1 bg-card border border-border rounded-[2rem] px-8 py-4 outline-none focus:border-slate-500/50 transition-colors"
-                             />
-                             <button onClick={handleSendMessage} className="w-16 h-16 rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-background dark:text-black">
-                               <Send className="w-6 h-6" />
-                             </button>
+                             <div className="mt-4 flex gap-2 md:gap-4">
+                              <input 
+                                type="text" 
+                                value={chatMessage}
+                                onChange={(e) => setChatMessage(e.target.value)}
+                                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+                                placeholder="Ask questions..."
+                                className="flex-1 bg-card border border-border rounded-[1.5rem] md:rounded-[2rem] px-4 md:px-8 py-3 md:py-4 text-sm outline-none focus:border-slate-500/50 transition-colors"
+                              />
+                              <button onClick={handleSendMessage} className="w-12 h-12 md:w-16 md:h-16 rounded-[1.5rem] md:rounded-[2rem] bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-600 flex items-center justify-center hover:scale-105 active:scale-95 transition-all text-background dark:text-black shrink-0">
+                                <Send className="w-5 h-5 md:w-6 md:h-6" />
+                              </button>
+                           </div>
                           </div>
                        </motion.div>
                     )}
@@ -851,6 +850,26 @@ Return ONLY valid JSON, no markdown:
                       </motion.div>
                     )}
 
+                    {activeTab === 'verify' && (
+                       <motion.div key="verify" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="luxury-card p-6 md:p-12 rounded-[2.5rem] md:rounded-[4rem] h-auto lg:h-[550px] overflow-y-auto custom-scrollbar-dark">
+                          <div className="flex justify-between items-center mb-8 md:mb-10">
+                             <h3 className="text-xl md:text-2xl font-black flex items-center gap-3 md:gap-4">
+                                <ShieldCheck className="w-5 h-5 md:w-6 md:h-6 text-indigo-600" /> Neural Extract Audit
+                             </h3>
+                             <button onClick={() => setExtractedData(editableData)} className="px-4 md:px-6 py-2 rounded-xl bg-indigo-600 text-white text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all">Update Workspace</button>
+                          </div>
+                          
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
+                             <EditField label="Consumer Name" value={editableData?.consumerName} onChange={(v:any) => setEditableData({...editableData, consumerName: v})} />
+                             <EditField label="Consumer Number" value={editableData?.consumerNo} onChange={(v:any) => setEditableData({...editableData, consumerNo: v})} />
+                             <EditField label="Fixed Charges" value={editableData?.fixedCharges} onChange={(v:any) => setEditableData({...editableData, fixedCharges: v})} />
+                             <EditField label="Sanctioned Load" value={editableData?.sanctionedLoad} onChange={(v:any) => setEditableData({...editableData, sanctionedLoad: v})} />
+                             <EditField label="Connection Type" value={editableData?.connectionType} onChange={(v:any) => setEditableData({...editableData, connectionType: v})} />
+                             <EditField label="Current Bill" value={editableData?.billAmount} onChange={(v:any) => setEditableData({...editableData, billAmount: v})} />
+                          </div>            
+                       </motion.div>
+                    )}
+
                     {activeTab === 'forecast' && (
                        <motion.div key="forecast" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="luxury-card p-12 rounded-[4rem] h-[550px] relative">
                           <div className="flex justify-between items-center mb-10">
@@ -870,34 +889,34 @@ Return ONLY valid JSON, no markdown:
                     )}
                  </AnimatePresence>
 
-                 <div className="mt-10 p-10 bg-background border border-border rounded-[3rem] shadow-2xl relative overflow-hidden group">
-                    <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-500/50 to-transparent animate-beam-move" />
-                    <div className="flex justify-between items-center mb-6">
-                       <div className="flex items-center gap-3">
-                          <Cpu className="w-4 h-4 text-indigo-600" />
-                          <span className="text-[10px] font-black uppercase tracking-[0.4em] text-slate-600">Technical Intelligence Stream</span>
-                       </div>
-                       <Activity className="w-4 h-4 text-indigo-600 animate-pulse" />
-                    </div>
-                    <div className="font-mono text-[10px] leading-relaxed h-20 overflow-y-auto opacity-40">
-                       {agentThoughts.map((t, i) => <div key={i}>[{new Date().toLocaleTimeString()}] [{t.type.toUpperCase()}] {t.message}</div>)}
-                       <div ref={terminalEndRef} />
-                    </div>
-                 </div>
+                 <div className="mt-6 md:mt-10 p-6 md:p-10 bg-background border border-border rounded-[2rem] md:rounded-[3rem] shadow-2xl relative overflow-hidden group">
+                     <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-slate-500/50 to-transparent animate-beam-move" />
+                     <div className="flex justify-between items-center mb-4 md:mb-6">
+                        <div className="flex items-center gap-2 md:gap-3">
+                           <Cpu className="w-3 h-3 md:w-4 md:h-4 text-indigo-600" />
+                           <span className="text-[8px] md:text-[10px] font-black uppercase tracking-[0.4em] text-slate-600">AI Intelligence Stream</span>
+                        </div>
+                        <Activity className="w-3 h-3 md:w-4 md:h-4 text-indigo-600 animate-pulse" />
+                     </div>
+                     <div className="font-mono text-[8px] md:text-[10px] leading-relaxed h-16 md:h-20 overflow-y-auto opacity-40 custom-scrollbar-dark">
+                        {agentThoughts.map((t, i) => <div key={i}>[{new Date().toLocaleTimeString()}] [{t.type.toUpperCase()}] {t.message}</div>)}
+                        <div ref={terminalEndRef} />
+                     </div>
+                  </div>
               </div>
             </div>
           )}
         </AnimatePresence>
       </main>
 
-      <footer className="relative z-50 p-12 flex justify-between items-center opacity-30 text-[10px] font-black uppercase tracking-widest">
+      <footer className="relative z-50 p-6 md:p-12 flex flex-col md:flex-row justify-between items-center gap-4 opacity-30 text-[8px] md:text-[10px] font-black uppercase tracking-widest text-center md:text-left">
          <div className="flex items-center gap-3">
             <Lock className="w-3 h-3 text-emerald-500" />
-            <span>System Prototype V16.0</span>
+            <span>Prototype V16.0 — Secured</span>
          </div>
-         <div className="flex gap-10">
+         <div className="flex flex-col md:flex-row gap-4 md:gap-10">
             <span>Orchestration: Gemini 1.5 Flash</span>
-            <span>Technical Suite</span>
+            <span>EnergyBae Technical Suite</span>
          </div>
       </footer>
     </div>
@@ -919,10 +938,25 @@ function Badge({ label }: { label: string }) {
 
 function SideButton({ id, label, active, set, icon: Icon }: any) {
   return (
-    <button onClick={() => set(id)} className={clsx("w-full flex items-center gap-4 px-8 py-6 rounded-[2rem] transition-all duration-500", active === id ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-[0_0_30px_rgba(79,70,229,0.3)]" : "hover:bg-white/5 text-muted-foreground")}>
-       <Icon className="w-5 h-5" />
-       <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
+    <button onClick={() => set(id)} className={clsx(
+      "flex-1 md:w-full flex flex-col md:flex-row items-center gap-2 md:gap-4 px-4 md:px-8 py-3 md:py-6 rounded-xl md:rounded-[2rem] transition-all duration-500 shrink-0",
+      active === id ? "bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg" : "hover:bg-white/5 text-muted-foreground"
+    )}>
+       <Icon className="w-4 h-4 md:w-5 md:h-5" />
+       <span className="text-[8px] md:text-[10px] font-black uppercase tracking-widest whitespace-nowrap">{label}</span>
     </button>
   );
 }
-
+function EditField({ label, value, onChange }: any) {
+  return (
+    <div className="space-y-2">
+       <p className="text-[9px] md:text-[10px] font-black text-indigo-400 uppercase tracking-widest ml-4">{label}</p>
+       <input 
+         type="text" 
+         value={value || ''} 
+         onChange={(e) => onChange(e.target.value)}
+         className="w-full bg-background border border-border rounded-xl md:rounded-2xl px-4 md:px-6 py-3 md:py-4 text-sm md:text-base outline-none focus:border-indigo-500/50 transition-colors font-medium"
+       />
+    </div>
+  );
+}
