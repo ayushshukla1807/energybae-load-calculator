@@ -69,6 +69,32 @@ export default function EnergyBaeDashboard() {
   const [batchFiles, setBatchFiles] = useState<File[]>([]);
   const [selectedProvider, setSelectedProvider] = useState("msedcl");
   const [isHoveringScanner, setIsHoveringScanner] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    
+    if (e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      if (isBatchMode) {
+        setBatchFiles(Array.from(e.dataTransfer.files));
+      } else {
+        setFile(e.dataTransfer.files[0]);
+        setError(null);
+      }
+    }
+  };
+
   const loadDemo = () => {
     setExtractedData({"consumerName":"SHRI MADHUSHAM ROOPCHAND KHOBRAGADE","consumerNo":"439320095567","billingUnit":"2020","fixedCharges":125,"sanctionedLoad":3.3,"connectionType":"90/LT I Res 1-Phase","billAmount":1460,"billingHistory":[{"month":"FEB 2024","units":99},{"month":"MAR 2024","units":151},{"month":"APR 2024","units":258},{"month":"MAY 2024","units":208},{"month":"JUN 2024","units":262},{"month":"JUL 2024","units":95},{"month":"AUG 2024","units":86},{"month":"SEP 2024","units":157},{"month":"OCT 2024","units":146},{"month":"NOV 2024","units":121},{"month":"DEC 2024","units":100},{"month":"JAN 2025","units":25}],"aiInsights":{"modelUsed":"Gemini 2.0 Flash (Primary)","loadEfficiency":"92%","seasonalityIndex":"1.15","confidence":0.99}});
     setEditableData({"consumerName":"SHRI MADHUSHAM ROOPCHAND KHOBRAGADE","consumerNo":"439320095567","billingUnit":"2020","fixedCharges":125,"sanctionedLoad":3.3,"connectionType":"90/LT I Res 1-Phase","billAmount":1460,"billingHistory":[{"month":"FEB 2024","units":99},{"month":"MAR 2024","units":151},{"month":"APR 2024","units":258},{"month":"MAY 2024","units":208},{"month":"JUN 2024","units":262},{"month":"JUL 2024","units":95},{"month":"AUG 2024","units":86},{"month":"SEP 2024","units":157},{"month":"OCT 2024","units":146},{"month":"NOV 2024","units":121},{"month":"DEC 2024","units":100},{"month":"JAN 2025","units":25}],"aiInsights":{"modelUsed":"Gemini 2.0 Flash (Primary)","loadEfficiency":"92%","seasonalityIndex":"1.15","confidence":0.99}});
@@ -397,8 +423,16 @@ Return ONLY valid JSON, no markdown:
                   </motion.div>
                 )}
 
-                <div className="luxury-card p-1 rounded-[3rem] relative group mb-6">
-                  <div className="p-10 border-2 border-dashed border-border rounded-[2.8rem] group-hover:border-indigo-500/20 transition-all">
+                <div 
+                  className="luxury-card p-1 rounded-[3rem] relative group mb-6"
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <div className={clsx(
+                    "p-10 border-2 border-dashed rounded-[2.8rem] transition-all",
+                    isDragging ? "border-indigo-500 bg-indigo-500/10" : "border-border group-hover:border-indigo-500/20"
+                  )}>
                     <input 
                       type="file" 
                       id="bill-upload" 
