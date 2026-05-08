@@ -82,51 +82,38 @@ export default function EnergyBaeMasterpiece() {
   };
 
   const executeAudit = async () => {
-    if (!file || !GEMINI_API_KEY) {
-      setError("Please upload a bill and ensure API Key is configured.");
+    if (!file) {
+      setError("Please upload an electricity bill first.");
       return;
     }
 
     setIsExtracting(true);
-    setProgress(20);
+    setProgress(10);
+    setError(null);
     
     try {
-      const reader = new FileReader();
-      const base64Promise = new Promise<string>((resolve) => {
-        reader.onload = () => resolve((reader.result as string).split(',')[1]);
-        reader.readAsDataURL(file);
-      });
-
-      const base64Data = await base64Promise;
-      setProgress(40);
-
-      const prompt = `You are a Senior Solar Engineer. Extract data from this Indian electricity bill.
-        Return ONLY valid JSON:
-        {
-          "consumerName": "string",
-          "consumerNo": "string",
-          "sanctionedLoad": number,
-          "fixedCharges": number,
-          "billingHistory": [{"month": "MMM-YY", "units": number}]
-        }`;
-
-      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: file.type, data: base64Data } }] }]
-        })
-      });
-
-      const result = await res.json();
-      const text = result.candidates[0].content.parts[0].text;
-      const cleanJson = text.replace(/```json|```/g, '').trim();
-      const parsed = JSON.parse(cleanJson);
+      const formData = new FormData();
+      formData.append("file", file);
       
-      setProgress(80);
+      setProgress(30);
+      const res = await fetch('/api/extract', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!res.ok) throw new Error("Server extraction failed");
+
+      const parsed = await res.json();
+      setProgress(90);
+      
+      if (parsed.error) {
+        throw new Error(parsed.error);
+      }
+
       setData(parsed);
       setProgress(100);
-    } catch (err) {
-      setError("Extraction failed. Please try a clearer image.");
+    } catch (err: any) {
+      setError(err.message || "Extraction failed. Please try a clearer image.");
     } finally {
       setIsExtracting(false);
     }
