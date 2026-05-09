@@ -135,8 +135,11 @@ export default function EnergyBaeMasterpiece() {
       a.download = `EnergyBae_Audit_${safeName}.xlsx`;
       document.body.appendChild(a);
       a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
+      
+      setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+      }, 1000);
     } catch (err) {
       console.error(err);
     }
