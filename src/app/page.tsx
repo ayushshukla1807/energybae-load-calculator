@@ -131,8 +131,12 @@ export default function EnergyBaeMasterpiece() {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `Solar_Audit_${data.consumerName.replace(/\s+/g, '_')}.xlsx`;
+      const safeName = data.consumerName ? data.consumerName.replace(/[^a-zA-Z0-9]/g, '_') : 'Report';
+      a.download = `EnergyBae_Audit_${safeName}.xlsx`;
+      document.body.appendChild(a);
       a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
     } catch (err) {
       console.error(err);
     }
