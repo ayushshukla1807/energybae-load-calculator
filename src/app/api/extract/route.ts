@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     const userApiKey = formData.get("apiKey") as string;
     const demoMode = formData.get("demoMode") as string;
 
-    const apiKey = userApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY;
+    const apiKey = userApiKey || process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GEMINI_API_KEY || "AIzaSyDt9H2wY9ybsXob6A_1lzunSg1cM0lbSXc";
     const groqKey = process.env.GROQ_API_KEY;
 
     // ============================================================
